@@ -22,6 +22,11 @@ class RedstartCpu(Cpu):
    PCI_PORT_SCD0 = PciPortDesc(0x2, 5)
    PCI_PORT_SCD1 = PciPortDesc(0x2, 3)
 
+   SMBUS_SC = 6
+   SMBUS_POL = 7
+   SMBUS_PWR = 8
+   SMBUS_FC = 9
+
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
 
@@ -85,3 +90,6 @@ class RedstartCpu(Cpu):
       bridge = self.pciRoot.pciBridge(device=desc.device, func=desc.func)
       desc.maybeAddQuirks(bridge.upstream)
       return bridge.downstreamPort(port=desc.port)
+
+   def getSmbus(self, desc):
+      return self.cpld.getSmbus(desc)
