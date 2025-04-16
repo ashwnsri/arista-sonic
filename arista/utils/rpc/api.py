@@ -218,5 +218,7 @@ class RpcLinecardApi(RpcApi):
    @registerSupToLinecardMethod
    async def gracefulShutdown(self):
       """Shutdown the linecard itself."""
+      with open('/host/reboot-cause/reboot-lc-by-supervisor.txt', 'w', encoding='utf-8') as f:
+         f.write('reboot by Supervisor\n')
       self.tasks.append(asyncio.create_task(self._doSelfReboot()))
       return {'status': True, 'detail': 'Reboot started'}
