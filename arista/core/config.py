@@ -57,6 +57,7 @@ class Config():
          cls.instance_.cooling_target_factor = 0.8
          cls.instance_.cooling_gc_count = 15
          cls.instance_.cooling_xcvrs_via_api = False
+         cls.instance_.cooling_override_xcvr_target = None
          cls.instance_.linecard_heartbeat_max_failed = 3
          cls.instance_.linecard_heartbeat_ping_count = 1
          cls.instance_._parseConfig()

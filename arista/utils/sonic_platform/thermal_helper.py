@@ -242,6 +242,12 @@ class CoolingXcvrThermal(CoolingThermal):
       super().__init__(*args, **kwargs)
       self._initialized = False
 
+   @property
+   def target(self):
+      if Config().cooling_override_xcvr_target is not None:
+         return Config().cooling_override_xcvr_target
+      return super().target
+
    def _float_or_none(self, value):
       return float(value) if value not in ['N/A', None] else None
 
