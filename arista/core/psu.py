@@ -170,11 +170,13 @@ class PsuManager:
 
       return None
 
-   def autodetectPmbusPsu(self, slot):
+   def autodetectPmbusPsu(self, slot, tryAll=True):
       psus = []
       detectors = {}
       # try expected PSU models first
-      models = slot.psus + [p for p in self.psuModels if p not in slot.psus]
+      models = slot.psus
+      if tryAll:
+         models = slot.psus + [p for p in self.psuModels if p not in slot.psus]
       for model in models:
          if not model.PMBUS_ADDR:
             continue
@@ -216,7 +218,7 @@ class PsuSlot(SlotComponent):
 
    def __init__(self, slotId=None, desc=None, addrFunc=None, psus=None,
                 presentGpio=None, inputOkGpio=None, outputOkGpio=None, led=None,
-                forcePsuLoad=False, **kwargs):
+                forcePsuLoad=False, autoDetectTryAll=True, **kwargs):
       super().__init__(**kwargs)
       self.slotId = slotId
       self.model = None
@@ -229,6 +231,7 @@ class PsuSlot(SlotComponent):
       self.led = led
       self.psus = psus or []
       self.forcePsuLoad = forcePsuLoad
+      self.autoDetectTryAll = autoDetectTryAll
 
       if self.addrFunc:
          self.addrFunc(0x00) # workaround to configure a bus wide parameter
@@ -245,7 +248,7 @@ class PsuSlot(SlotComponent):
       return model(ident)
 
    def autodetectPsuModel(self):
-      psus = getPsuManager().autodetectPmbusPsu(self)
+      psus = getPsuManager().autodetectPmbusPsu(self, self.autoDetectTryAll)
       if not psus:
          if self.forcePsuLoad:
             assert len(self.psus) == 1, "Forcing only works with one model"

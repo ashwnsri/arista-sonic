@@ -8,10 +8,14 @@ from ..core.utils import incrange
 
 from ..components.asic.xgs.tomahawk5 import Tomahawk5
 from ..components.cpld import SysCpldReloadCauseRegistersV2, SysCpldCause
+from ..components.lm75 import Tmp75
 from ..components.max6581 import Max6581
 from ..components.minke import Minke
+from ..components.psu.dcdc import (
+   DeltaU50su, DeltaU50suAddr18,
+   FlexBmr313, FlexBmr313Addr18,
+)
 from ..components.scd import Scd
-from ..components.lm75 import Tmp75
 from ..components.xcvr import CmisEeprom
 
 from ..descs.reset import ResetDesc
@@ -134,14 +138,18 @@ class Moby(FixedSystem):
          ) for i in range(0, self.BACKPLANE_CONNECTORS)
       ]
 
-      for psuId, bus in [(1, 16), (2, 17)]:
-         addrFunc=lambda addr, bus=bus: \
-                  scd.i2cAddr(bus, addr, t=3, datr=2, datw=3)
+      for psuId, psuClasses in [
+         (1, [FlexBmr313, DeltaU50su]),
+         (2, [FlexBmr313Addr18, DeltaU50suAddr18])
+      ]:
+         addrFunc=lambda addr: scd.i2cAddr(16, addr, t=3, datr=2, datw=3)
          self.scd.newComponent(
             PsuSlot,
             slotId=psuId,
             addrFunc=addrFunc,
             presentGpio=True,
+            psus=psuClasses,
+            autoDetectTryAll=False
          )
 
       port = self.cpu.getPciPort(3)

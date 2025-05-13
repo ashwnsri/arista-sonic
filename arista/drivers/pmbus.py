@@ -113,20 +113,32 @@ class PmbusKernelDriver(I2cKernelDriver):
    MODULE = 'pmbus'
    NAME = 'pmbus'
 
+   def createIsGoodFunc(self, entries):
+      def func():
+         # Iterate entries, return _input of the first with matching labelPrefix
+         for entry, labelPrefix in entries:
+            try:
+               with open(self.getHwmonEntry("%s_label" % entry),
+                         encoding='utf8') as f:
+                  label = f.read()
+                  if not label.startswith(labelPrefix):
+                     continue
+            except Exception: # pylint: disable=broad-except
+               continue
+
+            try:
+               with open(self.getHwmonEntry("%s_input" % entry),
+                         encoding='utf8') as f:
+                  return 1 if int(f.read()) else 0
+            except Exception: # pylint: disable=broad-except
+               return 0
+         return 0
+      return func
+
    def getInputOkGpio(self):
-      def _isGood(value=None):
-         try:
-            with open(self.getHwmonEntry('power1_input'), encoding='utf8') as f:
-               return 1 if int(f.read()) else 0
-         except Exception: # pylint: disable=broad-except
-            return 0
+      _isGood = self.createIsGoodFunc([('power1', 'pin'), ('in1', 'vin')])
       return GpioFuncImpl(self, _isGood, name='input_ok')
 
    def getOutputOkGpio(self, name=''):
-      def _isGood(value=None):
-         try:
-            with open(self.getHwmonEntry('power2_input'), encoding='utf8') as f:
-               return 1 if int(f.read()) else 0
-         except Exception: # pylint: disable=broad-except
-            return 0
+      _isGood = self.createIsGoodFunc([('power2', 'pout'), ('power1', 'pout')])
       return GpioFuncImpl(self, _isGood, name='output_ok')
