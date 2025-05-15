@@ -152,6 +152,23 @@ class QuicksilverBase(FixedSystem):
          SysCpldCause(0x09, SysCpldCause.POWERLOSS, 'PSU AC'),
          SysCpldCause(0x0a, SysCpldCause.POWERLOSS, 'PSU DC'),
          SysCpldCause(0x0f, SysCpldCause.SEU, 'bitshadow rx parity error'),
+         SysCpldCause(0x10, SysCpldCause.REBOOT, 'Software Reboot via CPLD'),
+         SysCpldCause(0x11, SysCpldCause.POWERLOSS, 'Supervisor unseated'),
+         SysCpldCause(0x20, SysCpldCause.RAIL, 'CPLD_PWR_FAULT'),
+         SysCpldCause(0x21, SysCpldCause.RAIL, 'POS5V0_FAULT'),
+         SysCpldCause(0x22, SysCpldCause.RAIL, 'POS3V3_FAULT'),
+         SysCpldCause(0x23, SysCpldCause.RAIL, 'POS2V5_FAULT'),
+         SysCpldCause(0x24, SysCpldCause.RAIL, 'POS1V8_FAULT'),
+         SysCpldCause(0x25, SysCpldCause.RAIL, 'POS0V8_VDD_FAULT'),
+         SysCpldCause(0x26, SysCpldCause.RAIL, 'POS1V2_FAULT'),
+         SysCpldCause(0x27, SysCpldCause.RAIL, 'POS1V5_FAULT'),
+         SysCpldCause(0x28, SysCpldCause.RAIL, 'POS0V8_PCIE_FAULT'),
+         SysCpldCause(0x29, SysCpldCause.RAIL, 'POS0V75_AVDD_0_FAULT'),
+         SysCpldCause(0x2a, SysCpldCause.RAIL, 'POS0V75_AVDD_1_FAULT'),
+         SysCpldCause(0x2b, SysCpldCause.RAIL, 'POS0V9_AVDD_0_FAULT'),
+         SysCpldCause(0x2c, SysCpldCause.RAIL, 'POS0V9_AVDD_1_FAULT'),
+         SysCpldCause(0x2d, SysCpldCause.RAIL, 'POS3V3_OPTICS_A_FAULT'),
+         SysCpldCause(0x2e, SysCpldCause.RAIL, 'POS3V3_OPTICS_B_FAULT'),
       ], regmap=SysCpldReloadCauseRegistersV2)
 
 @registerPlatform()

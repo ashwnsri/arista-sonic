@@ -1,6 +1,5 @@
 from ...core.cpu import Cpu
 from ...core.pci import PciPortDesc, PciRoot
-from ...core.utils import incranges
 
 from ...components.cpu.amd.k10temp import K10Temp
 from ...components.cpu.redstart import (
@@ -43,7 +42,7 @@ class RedstartCpu(Cpu):
 
       self.fanboard = self.parent.CHASSIS.addFanboard(cpld, cpld.getSmbus(9))
 
-      self.syscpld = self.newComponent(RedstartSysCpld, addr=cpld.i2cAddr(6, 0x23))
+      self.syscpld = cpld.newComponent(RedstartSysCpld, addr=cpld.i2cAddr(6, 0x23))
       self.syscpld.addPowerCycle()
 
       cpld.addReloadCauseProvider(causes=[
@@ -52,12 +51,33 @@ class RedstartCpu(Cpu):
          ScdCause(0x0a, ScdCause.POWERLOSS, 'PSU DC to CPU'),
          ScdCause(0x0c, ScdCause.CPU),
          ScdCause(0x0d, ScdCause.CPU_S3, 'CPU Sleep Mode'),
-      ] + [
-         ScdCause(v, ScdCause.RAIL) for v in incranges(
-            (0x20, 0x24),
-            (0x28, 0x2e),
-            (0x31, 0x3d),
-         )
+         ScdCause(0x12, ScdCause.POWERLOSS, 'Supervisor unseated'),
+         ScdCause(0x20, ScdCause.RAIL, 'VR_VDDCR_FAULT'),
+         ScdCause(0x21, ScdCause.RAIL, 'VR_VDDSOC_FAULT'),
+         ScdCause(0x22, ScdCause.RAIL, 'DDR5_SODIMM2_FAULT'),
+         ScdCause(0x23, ScdCause.RAIL, 'DDR5_SODIMM1_FAULT'),
+         ScdCause(0x24, ScdCause.RAIL, 'P1V8_CPU_FAULT'),
+         ScdCause(0x28, ScdCause.RAIL, 'P3V3_CPU_FAULT'),
+         ScdCause(0x29, ScdCause.RAIL, 'P3V3_RGMII_FAULT'),
+         ScdCause(0x2a, ScdCause.RAIL, 'POS1V1_MEM_FAULT'),
+         ScdCause(0x2b, ScdCause.RAIL, 'POS0V78_MEM_FAULT'),
+         ScdCause(0x2c, ScdCause.RAIL, 'POS5V_ALW_FAULT'),
+         ScdCause(0x2d, ScdCause.RAIL, 'POS1V8_BMC_FAULT'),
+         ScdCause(0x2e, ScdCause.RAIL, 'POS3V3_BMC_FAULT'),
+         ScdCause(0x31, ScdCause.RAIL, 'POS1V2_BMC_FAULT'),
+         ScdCause(0x32, ScdCause.RAIL, 'POS2V5_BMC_FAULT'),
+         ScdCause(0x33, ScdCause.RAIL, 'POS0V75_CPU_FAULT'),
+         ScdCause(0x34, ScdCause.RAIL, 'POS1V8_ALW_FAULT'),
+         ScdCause(0x35, ScdCause.RAIL, 'POS1V0_MSW_FAULT'),
+         ScdCause(0x36, ScdCause.RAIL, 'POS1V2_FAULT'),
+         ScdCause(0x37, ScdCause.RAIL, 'POS2V5_CPLD_FAULT'),
+         ScdCause(0x38, ScdCause.RAIL, 'POS0V75_ALW_FAULT'),
+         ScdCause(0x39, ScdCause.RAIL, 'POS0V96_I226_FAULT'),
+         ScdCause(0x3a, ScdCause.RAIL, 'APU_PWROK_FAULT'),
+         ScdCause(0x3b, ScdCause.RAIL, 'POS3V3_ALW_FAULT'),
+         ScdCause(0x3c, ScdCause.CPU, 'CPU ERROR_N'),
+         ScdCause(0x3d, ScdCause.RAIL, 'BMC_PGOOD_FAULT'),
+         ScdCause(0x3e, ScdCause.CPU, 'Bios SMN init timeout'),
       ], regmap=RedstartReloadCauseRegisters,
          priority=ScdCause.Priority.SECONDARY)
 
