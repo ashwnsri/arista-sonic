@@ -1137,7 +1137,7 @@ static int cpld_probe(struct i2c_client *client,
 }
 
 static const struct i2c_device_id cpld_id[] = {
-   { "pali2_cpld_wip", PALI2_CPLD },
+   { "pali2_cpld", PALI2_CPLD },
    { "minke_cpld", MINKE_CPLD },
    {}
 };
