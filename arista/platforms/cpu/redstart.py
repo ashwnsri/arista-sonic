@@ -1,5 +1,5 @@
 from ...core.cpu import Cpu
-from ...core.pci import PciRoot
+from ...core.pci import PciPortDesc, PciRoot
 from ...core.utils import incranges
 
 from ...components.cpu.amd.k10temp import K10Temp
@@ -16,6 +16,11 @@ class RedstartCpu(Cpu):
    PLATFORM = 'redstart'
    SID = ['Redstart8Mk2']
    SKU = ['DCS-7001-SUP-L']
+
+   PCI_PORT_ASIC0 = PciPortDesc(0x1, 2)
+   PCI_PORT_ASIC1 = PciPortDesc(0x1, 3)
+   PCI_PORT_SCD0 = PciPortDesc(0x2, 5)
+   PCI_PORT_SCD1 = PciPortDesc(0x2, 3)
 
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
@@ -55,11 +60,6 @@ class RedstartCpu(Cpu):
       ], regmap=RedstartReloadCauseRegisters,
          priority=ScdCause.Priority.SECONDARY)
 
-   def getPciPort(self, num):
-      device, func = {
-         0: (0x1, 2),
-         2: (0x2, 5),
-         3: (0x2, 3),
-      }[num]
-      bridge = self.pciRoot.pciBridge(device=device, func=func)
-      return bridge.downstreamPort(port=0)
+   def getPciPort(self, desc):
+      bridge = self.pciRoot.pciBridge(device=desc.device, func=desc.func)
+      return bridge.downstreamPort(port=desc.port)
