@@ -11,6 +11,7 @@ from ..components.cpld import SysCpldReloadCauseRegistersV2, SysCpldCause
 from ..components.lm75 import Tmp75
 from ..components.max6581 import Max6581
 from ..components.minke import Minke
+from ..components.pci import EcrcPciQuirk
 from ..components.psu.dcdc import (
    DeltaU50su, DeltaU50suAddr18,
    FlexBmr313, FlexBmr313Addr18,
@@ -196,6 +197,7 @@ class Moby(FixedSystem):
          pcieResets=[
             scd.inventory.getReset('switch_chip_pcie_reset'),
          ],
+         quirks=[EcrcPciQuirk()],
       )
 
       self.syscpld.addReloadCauseProvider(causes=[
