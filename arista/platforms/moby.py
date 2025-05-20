@@ -16,7 +16,7 @@ from ..components.psu.dcdc import (
    DeltaU50su, DeltaU50suAddr18,
    FlexBmr313, FlexBmr313Addr18,
 )
-from ..components.scd import Scd
+from ..components.scd import Scd, ScdCause, ScdReloadCauseRegisters
 from ..components.xcvr import CmisEeprom
 
 from ..descs.reset import ResetDesc
@@ -164,6 +164,16 @@ class Moby(FixedSystem):
             target=65, overheat=80, critical=95),
       ])
 
+      pscd.addReloadCauseProvider(causes=[
+         ScdCause(0x01, ScdCause.OVERTEMP),
+         ScdCause(0x20, ScdCause.RAIL, 'P5V0_PGOOD'),
+         ScdCause(0x24, ScdCause.RAIL, 'SWITCH_PGOOD'),
+         ScdCause(0x25, ScdCause.RAIL, 'P3V3_OPTICS_EN'),
+         ScdCause(0x26, ScdCause.RAIL, 'P3V3_OPTICS_PGOOD'),
+         ScdCause(0x27, ScdCause.RAIL, 'PC_PGOOD'),
+      ], regmap=ScdReloadCauseRegisters,
+         priority=ScdCause.Priority.SECONDARY)
+
       pintrRegs = [
          scd.createInterrupt(addr=0x3000, num=0),
          scd.createInterrupt(addr=0x3030, num=1),
@@ -209,6 +219,25 @@ class Moby(FixedSystem):
          SysCpldCause(0x04, SysCpldCause.CPU, 'CPU source or CPU PGOOD',
                       priority=SysCpldCause.Priority.LOW),
          SysCpldCause(0x08, SysCpldCause.REBOOT),
+         SysCpldCause(0x09, SysCpldCause.POWERLOSS, 'PSU AC'),
          SysCpldCause(0x0a, SysCpldCause.POWERLOSS, 'PSU DC'),
+         SysCpldCause(0x0b, SysCpldCause.NOFANS),
          SysCpldCause(0x0f, SysCpldCause.SEU, 'bitshadow rx parity error'),
+         SysCpldCause(0x10, SysCpldCause.REBOOT, 'Powercycle via CPLD'),
+         SysCpldCause(0x11, SysCpldCause.POWERLOSS, 'Supervisor unseated'),
+         SysCpldCause(0x20, SysCpldCause.RAIL, 'P12V_MOD_PG'),
+         SysCpldCause(0x21, SysCpldCause.RAIL, 'CPLD_PWR_GOOD'),
+         SysCpldCause(0x22, SysCpldCause.RAIL, 'P5V0_PGOOD'),
+         SysCpldCause(0x23, SysCpldCause.RAIL, 'P3V3_PGOOD'),
+         SysCpldCause(0x24, SysCpldCause.RAIL, 'P2V5_PGOOD'),
+         SysCpldCause(0x25, SysCpldCause.RAIL, 'P1V8_PGOOD'),
+         SysCpldCause(0x26, SysCpldCause.RAIL, 'P0V8_VDD_PGOOD'),
+         SysCpldCause(0x27, SysCpldCause.RAIL, 'P1V2_PGOOD'),
+         SysCpldCause(0x28, SysCpldCause.RAIL, 'P1V5_PGOOD'),
+         SysCpldCause(0x29, SysCpldCause.RAIL, 'P0V8_PCIE_PGOOD'),
+         SysCpldCause(0x2a, SysCpldCause.RAIL, 'P0V75_AVDD_0_PGOOD'),
+         SysCpldCause(0x2b, SysCpldCause.RAIL, 'P0V75_AVDD_1_PGOOD'),
+         SysCpldCause(0x2c, SysCpldCause.RAIL, 'P0V9_AVDD_0_PGOOD'),
+         SysCpldCause(0x2d, SysCpldCause.RAIL, 'P0V9_AVDD_1_PGOOD'),
+         SysCpldCause(0x2e, SysCpldCause.RAIL, 'PC_PGOOD'),
       ], regmap=SysCpldReloadCauseRegistersV2)
