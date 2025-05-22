@@ -65,3 +65,7 @@ class CrowCpu(Cpu):
       }[num]
       bridge = self.pciRoot.pciBridge(device=device, func=func)
       return bridge.downstreamPort(port=0)
+
+   def setup(self):
+      self.applyQuirks()
+      super(CrowCpu, self).setup()

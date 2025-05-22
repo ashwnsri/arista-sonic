@@ -67,6 +67,23 @@ class DramScrubberQuirk(Quirk):
       with open(path, 'w', encoding='utf8') as f:
          f.write(str(self.rate))
 
+class CrowCpuFreqQuirk(Quirk):
+   def __init__(self, freq=2000000, description='change CPU max frequency'):
+      self.freq = freq
+      self.cores = 4
+      self.description = description
+
+   def __str__(self):
+      return self.description
+
+   def run(self, component):
+      if inSimulation():
+         return
+      pathFmt = '/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq'
+      for i in range(self.cores):
+         with open(pathFmt % i, 'w', encoding='utf8') as f:
+            f.write(str(self.freq))
+
 class CrowSysCpld(SysCpld):
    REGISTER_CLS = CrowCpldRegisters
    QUIRKS = [

@@ -11,6 +11,7 @@ from ..components.cpld import (
    SysCpldCommonRegistersV2,
    SysCpldReloadCauseRegistersV2,
 )
+from ..components.cpu.crow import CrowCpuFreqQuirk
 from ..components.dpm.ucd import Ucd90120A, UcdGpi
 from ..components.max6658 import Max6658
 from ..components.psu.delta import DPS495CB, DPS500AB
@@ -42,6 +43,7 @@ class LodogaPrimeCpldRegisters(SysCpldCommonRegistersV2):
    pass
 
 class LodogaBase(FixedSystem):
+   LODOGA_QUIRKS = []
 
    PORTS = PortLayout(
       (Qsfp28(i, leds=4) for i in incrange(1, 32)),
@@ -51,7 +53,8 @@ class LodogaBase(FixedSystem):
    def __init__(self, cpuCls, syscpldRegisters):
       super().__init__()
 
-      cpu = self.newComponent(cpuCls, registerCls=syscpldRegisters)
+      cpu = self.newComponent(cpuCls, registerCls=syscpldRegisters,
+                              quirks=self.LODOGA_QUIRKS)
       self.cpu = cpu
       self.syscpld = cpu.syscpld
 
@@ -153,6 +156,7 @@ class Lodoga(LodogaBase):
    PSU_CLS = [DPS495CB, DS495SPE]
    SCD_PCI_PORT_IDX = 1
    SWITCH_CHIPSET_PCI_PORT_IDX = 0
+   LODOGA_QUIRKS = [CrowCpuFreqQuirk()]
 
    class SmBusAddresses(object):
       TS  = 9
