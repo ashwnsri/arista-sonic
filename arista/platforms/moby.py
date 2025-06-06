@@ -73,8 +73,8 @@ class Moby(FixedSystem):
       (Qsfp28(25),),
    )
 
-   SID = ['Moby', 'Redstart8CFixedNMoby']
-   SKU = ['DCS-7060X6-16PE-384C']
+   SID = ['Moby', 'RedstartFixed8CNMoby']
+   SKU = ['DCS-7060X6-16PE-384C', 'DCS-7060X6-16PE-384C-B']
 
    def __init__(self):
       super().__init__()
