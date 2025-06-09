@@ -139,17 +139,24 @@ def readPrefdl():
 
    return readI2cPrefdlEeprom()
 
-def getFanDirectionSku(prefdlData):
+def getSonicSku(prefdlData):
    sku = prefdlData.get("SKU")
    sid = prefdlData.get("SID")
+   hwApi = prefdlData.get("HwApi")
 
    newSku = sku
 
+   # Add fan direction for Pikez
    fandirRe = "-.*(?P<fandir>(R|F))$"
    sid_mo = re.search(fandirRe, sid)
    sku_mo = re.search(fandirRe, sku)
    if sid_mo and not sku_mo:
       newSku += sid_mo.group('fandir')
+
+   # Add -B for Moby512
+   if sku == 'DCS-7060X6-16PE-384C' and hwApi != '01.00':
+      newSku += '-B'
+
    return newSku
 
 class SysEeprom(object):

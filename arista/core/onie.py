@@ -7,12 +7,12 @@ from ..libs.config import parseKeyValueConfig
 from ..libs.procfs import getCmdlineDict
 from ..libs.onie import getMachineConfigDict
 
-from .platform import getFanDirectionSku
+from .platform import getSonicSku
 
 class OnieEeprom(object):
    def __init__(self, prefdl):
       self.fields = {
-         0x21: getFanDirectionSku(prefdl),
+         0x21: getSonicSku(prefdl),
          0x22: prefdl.get('ASY'),
          0x23: prefdl.get('SerialNumber'),
          0x24: prefdl.get('MAC', ''),
