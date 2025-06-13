@@ -499,7 +499,7 @@ def libraryInit():
    global simulation, debug, SMBus
 
    cmdline = getCmdlineDict()
-   if "Aboot" in cmdline:
+   if "Aboot" in cmdline or os.path.exists('/etc/sonic'):
       simulation = False
 
    if "arista-debug" in cmdline:
