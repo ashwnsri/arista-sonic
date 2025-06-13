@@ -1,9 +1,8 @@
 [Unit]
 Description=Arista early platform initialization
-After=local-fs.target
+After=rc-local.service
 Before=opennsl-modules.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 
 [Service]
 Type=oneshot

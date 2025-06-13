@@ -1,8 +1,8 @@
 [Unit]
 Description=Enable the watchdog before platform initialization
 Before=platform-arista-swss.service
+After=rc-local.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sid=Gardena
 
 [Service]

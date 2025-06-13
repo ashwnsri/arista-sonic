@@ -3,7 +3,6 @@ Description=Disable the watchdog after platform initialization
 After=swss.service
 After=opennsl-modules.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sid=Gardena
 
 [Service]

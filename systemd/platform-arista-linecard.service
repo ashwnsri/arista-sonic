@@ -3,7 +3,6 @@ Description=Arista linecard support
 After=platform-arista-fabric.service
 Requires=platform-arista-fabric.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sonic.mode=supervisor
 
 [Service]

@@ -4,7 +4,6 @@ After=platform-arista-pmon.service
 Requires=platform-arista-pmon.service
 Before=process-reboot-cause.service determine-reboot-cause.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 
 [Service]
 Type=oneshot

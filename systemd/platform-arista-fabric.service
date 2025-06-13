@@ -5,7 +5,6 @@ Before=opennsl-modules.service
 After=platform-arista-pmon.service
 Requires=platform-arista-pmon.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sonic.mode=supervisor
 
 [Service]

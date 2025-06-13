@@ -3,7 +3,6 @@ Description=Early network configuration for Arista chassis
 Before=database-chassis.service
 Before=platform-arista-linecard.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sonic.mode=supervisor
 
 [Service]

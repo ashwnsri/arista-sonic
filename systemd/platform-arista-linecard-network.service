@@ -3,7 +3,6 @@ Description=Internal networking configuration for Arista linecards
 Before=interfaces-config.service
 Before=database.service
 PartOf=platform-arista.target
-ConditionKernelCommandLine=Aboot
 ConditionKernelCommandLine=sonic.mode=linecard
 
 [Service]
