@@ -63,11 +63,11 @@ class Psu(PsuBase):
 
    def get_revision(self):
       psu = self.psu
-      return psu.getRevision() if psu else "N/A"
+      return psu.getRevision().replace('\x00', '') if psu else "N/A"
 
    def get_serial(self):
       psu = self.psu
-      return psu.getSerial() if psu else "N/A"
+      return psu.getSerial().replace('\x00', '') if psu else "N/A"
 
    def get_status(self):
       # TODO: check status of power supply itself
