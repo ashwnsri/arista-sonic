@@ -138,11 +138,11 @@ class DenaliSupervisor(Supervisor):
             desc=desc,
             addrFunc=pca.i2cAddr,
             presentGpio=self.scd.inventory.getGpio('%s_present' % name),
-            inputOkGpio=self.scd.inventory.getGpio('%s_ok' % name),
-            outputOkGpio=[
+            inputOkGpio=[
                self.scd.inventory.getGpio('%s_ac_a_ok' % name),
                self.scd.inventory.getGpio('%s_ac_b_ok' % name),
             ],
+            outputOkGpio=self.scd.inventory.getGpio('%s_ok' % name),
             psus=[
                ECD3000M,
                Art700,
