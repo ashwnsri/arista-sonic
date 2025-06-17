@@ -154,7 +154,7 @@ def getSonicSku(prefdlData):
       newSku += sid_mo.group('fandir')
 
    # Add -B for Moby512
-   if sku == 'DCS-7060X6-16PE-384C' and hwApi != '01.00':
+   if sku == 'DCS-7060X6-16PE-384C' and hwApi != (1, 0):
       newSku += '-B'
 
    return newSku
