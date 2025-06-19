@@ -46,7 +46,7 @@ class QuartzDd(FixedSystem):
             UcdGpi(8, ReloadCauseDesc.CPU),
       ])
 
-      port = self.cpu.getPciPort(0)
+      port = self.cpu.getPciPort(self.cpu.PCI_PORT_SCD0)
       scd = port.newComponent(Scd, addr=port.addr)
 
       scd.createWatchdog()
@@ -131,7 +131,7 @@ class QuartzDd(FixedSystem):
          intrBitFn=lambda xcvrId: (xcvrId - 1) % 32,
       )
 
-      port = self.cpu.getPciPort(1)
+      port = self.cpu.getPciPort(self.cpu.PCI_PORT_ASIC0)
       self.je0 = port.newComponent(Jericho2cPlus, addr=port.addr,
          coreResets=[
             scd.inventory.getReset('switch_chip0_reset'),
@@ -140,7 +140,7 @@ class QuartzDd(FixedSystem):
             scd.inventory.getReset('switch_chip0_pcie_reset'),
          ],
       )
-      port = self.cpu.getPciPort(2)
+      port = self.cpu.getPciPort(self.cpu.PCI_PORT_ASIC1)
       self.je1 = port.newComponent(Jericho2cPlus, addr=port.addr,
          coreResets=[
             scd.inventory.getReset('switch_chip1_reset'),

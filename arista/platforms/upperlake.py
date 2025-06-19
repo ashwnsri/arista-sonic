@@ -40,7 +40,7 @@ class Upperlake(FixedSystem):
       self.cpu = cpu
       self.syscpld = cpu.syscpld
 
-      port = cpu.getPciPort(1)
+      port = cpu.getPciPort(self.cpu.PCI_PORT_SCD0)
       scd = port.newComponent(Scd, addr=port.addr)
       self.scd = scd
 
@@ -131,7 +131,7 @@ class Upperlake(FixedSystem):
          isHwLpModeAvail=False,
       )
 
-      port = cpu.getPciPort(0)
+      port = cpu.getPciPort(self.cpu.PCI_PORT_ASIC0)
       port.newComponent(Tomahawk, addr=port.addr,
          coreResets=[
             scd.inventory.getReset('switch_chip_reset'),

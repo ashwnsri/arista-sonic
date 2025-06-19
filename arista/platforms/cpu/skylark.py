@@ -1,5 +1,5 @@
 from ...core.cpu import Cpu
-from ...core.pci import PciRoot
+from ...core.pci import PciPortDesc, PciRoot
 
 from ...components.cpu.amd.k10temp import K10Temp
 from ...components.cpld import (
@@ -17,6 +17,9 @@ class SkylarkSysCpld(SysCpld):
 class SkylarkCpu(Cpu):
 
    PLATFORM = 'skylark'
+
+   PCI_PORT_ASIC0 = PciPortDesc(0x01, 1)
+   PCI_PORT_SCD0 = PciPortDesc(0x02, 4)
 
    def __init__(self, registerCls=SysCpldCommonRegistersV2, **kwargs):
       super().__init__(**kwargs)
@@ -99,14 +102,6 @@ class SkylarkCpu(Cpu):
 
    def addScdComponents(self, scd, hwmonBus=0):
       pass
-
-   def getPciPort(self, num):
-      device, func = {
-         0: (0x02, 4),
-         2: (0x01, 1),
-      }[num]
-      bridge = self.pciRoot.pciBridge(device=device, func=func)
-      return bridge.downstreamPort(port=0)
 
    def addFanGroup(self, slots=3, count=2):
       self.cpld.addFanGroup(0x9000, 3, slots, count)

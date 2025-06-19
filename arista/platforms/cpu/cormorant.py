@@ -1,5 +1,5 @@
 from ...core.cpu import Cpu
-from ...core.pci import PciRoot
+from ...core.pci import PciPortDesc, PciRoot
 
 from ...components.cpu.amd.k10temp import K10Temp
 from ...components.cpu.cormorant import (
@@ -16,6 +16,10 @@ from ...descs.sensor import Position, SensorDesc
 class CormorantCpu(Cpu):
 
    PLATFORM = 'cormorant'
+
+   PCI_PORT_ASIC0 = PciPortDesc(0x03, 5)
+   PCI_PORT_ASIC1 = PciPortDesc(0x01, 4)
+   PCI_PORT_SCD0 = PciPortDesc(0x01, 1)
 
    def __init__(self, cpldRegisterCls=CormorantCpldRegisters, **kwargs):
       super(CormorantCpu, self).__init__(**kwargs)
@@ -77,12 +81,3 @@ class CormorantCpu(Cpu):
 
    def addFanGroup(self, slots=3, count=2):
       self.cpld.addFanGroup(0x9000, 3, slots, count)
-
-   def getPciPort(self, num):
-      device, func = {
-         0: (0x01, 1),
-         1: (0x03, 5),
-         2: (0x01, 4),
-      }[num]
-      bridge = self.pciRoot.pciBridge(device=device, func=func)
-      return bridge.downstreamPort(port=0)
