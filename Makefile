@@ -101,6 +101,12 @@ build-py3whl:
 	$(PYTHON3) -m build --wheel --no-isolation --outdir $(BUILD_DIR)
 
 build-py: $(addprefix build-,$(PY_TARGETS)) build-py3whl
+	for dir in $$(find $(BASE_DIR)/$(PACKAGE_NAME) -type d -not -name __pycache__); do \
+		if ! test -f "$$dir/__init__.py"; then \
+			echo "missing: $$dir/__init__.py"; \
+			exit 1; \
+		fi; \
+	done
 
 build: build-drivers build-py build-libs
 

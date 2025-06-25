@@ -1,17 +1,19 @@
 from ...core.cpu import Cpu
 from ...core.pci import PciPortDesc, PciRoot
 
+from ...components.cpu.amd.amdi0030 import AmdGpioController
 from ...components.cpu.amd.k10temp import K10Temp
 from ...components.cpu.cormorant import (
    CormorantCpldRegisters,
    CormorantSysCpld,
 )
-
 from ...components.dpm.adm1266 import Adm1266, AdmCause
 from ...components.max6658 import Max6658
 from ...components.scd import Scd
 
+from ...descs.gpio import GpioDesc
 from ...descs.sensor import Position, SensorDesc
+
 
 class CormorantCpu(Cpu):
 
@@ -23,6 +25,9 @@ class CormorantCpu(Cpu):
 
    def __init__(self, cpldRegisterCls=CormorantCpldRegisters, **kwargs):
       super(CormorantCpu, self).__init__(**kwargs)
+
+      self.cpuGpios = self.newComponent(AmdGpioController)
+      self.cpuGpios.addPowerCycle(GpioDesc('power_cycle', addr=4))
 
       self.pciRoot = self.newComponent(PciRoot)
       port = self.pciRoot.rootPort(device=0x18, func=3)
@@ -57,10 +62,6 @@ class CormorantCpu(Cpu):
                                        registerCls=cpldRegisterCls)
 
    def addCpuDpm(self, addr=None, causes=None):
-      """
-      The ADM1266 DPM logs a snapshot of GPI_[6:2] as EVENT_[4:0],
-      Unlike Lorikeet, these causes are not one-hot encoded
-      """
       addr = addr or self.cpuDpmAddr()
       gpioMask = 0b000111110
       return self.cpld.newComponent(Adm1266, addr=addr, causes=causes or [
