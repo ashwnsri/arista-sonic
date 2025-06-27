@@ -24,7 +24,6 @@ host_prefdl_path_bin = flashPath('.system-prefdl-bin')
 fmted_prefdl_path = etcPath('.syseeprom')
 
 PREREQUISITES = [
-   KernelDriver(module='eeprom'),
    KernelDriver(module='i2c-dev'),
 ]
 IDENT_BUS_NAMES = [
