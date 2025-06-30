@@ -38,6 +38,19 @@ Depends:
    i2c-tools
 Description: Miscellaneous Arista scripts and tools
 
+Package: sonic-platform-arista-all
+Architecture: amd64
+Depends:
+   ${python3:Depends},
+   ${misc:Depends},
+   python3(>=3.5),
+   i2c-tools,
+   python3-bottle,
+   python3-smbus,
+   python3-yaml,
+   linux-image-4.19.0-6-amd64-unsigned
+Description: Arista platform library as a single package
+
 Package: sonic-platform-arista-libs
 Architecture: amd64
 Depends:

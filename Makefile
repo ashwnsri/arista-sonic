@@ -40,6 +40,9 @@ LIB_DESTDIR     ?= $(DESTDIR)/usr/lib
 LOGROTATE_DESTDIR ?= $(DESTDIR)/etc/logrotate.d/
 DBGDUMP_DESTDIR ?= $(DESTDIR)/usr/local/bin/debug-dump
 
+PLATFORM_DESTDIR ?= $(DESTDIR)/usr/share/sonic/device
+PLATFORM_COMMON_DESTDIR ?= $(PLATFORM_DESTDIR)/x86_64-arista_common
+
 # build
 PY_BUILD_ARGS ?=
 PY2_BUILD_ARGS ?= $(PY_BUILD_ARGS) --build-base=$(BUILD_DIR)/python2
@@ -93,7 +96,11 @@ build-py3:
 	echo "$$library_version" > $(BASE_DIR)/$(PACKAGE_NAME)/__version__.py
 	$(PYTHON3) setup.py build $(PY3_BUILD_ARGS)
 
-build-py: $(addprefix build-,$(PY_TARGETS))
+build-py3whl:
+	echo "$$library_version" > $(BASE_DIR)/$(PACKAGE_NAME)/__version__.py
+	$(PYTHON3) -m build --wheel --no-isolation --outdir $(BUILD_DIR)
+
+build-py: $(addprefix build-,$(PY_TARGETS)) build-py3whl
 
 build: build-drivers build-py build-libs
 
@@ -135,6 +142,10 @@ install-py2:
 install-py3:
 	$(MKDIR) -p $(PY3_DESTDIR)
 	$(PYTHON3) setup.py install --root=$(PY3_DESTDIR) $(PY_INSTALL_ARGS)
+
+install-py3whl:
+	$(MKDIR) -p $(PLATFORM_COMMON_DESTDIR)
+	cp $(wildcard $(BUILD_DIR)/*.whl) $(PLATFORM_COMMON_DESTDIR)
 
 install-drivers:
 	$(MKDIR) -p $(DRV_DESTDIR)

@@ -49,7 +49,7 @@ class build_py_with_exclude(build_py):
       ]
 
 setup(
-   name='platform-arista',
+   name='sonic_platform',
    version='%s' % os.environ.get('ARISTA_PLATFORM_MODULE_VERSION', '1.0'),
    description='Module to initialize arista platforms',
    install_requires=py_install_requires,
