@@ -231,7 +231,7 @@ class PsuSlot(SlotComponent):
       self.led = led
       self.psus = psus or []
       self.forcePsuLoad = forcePsuLoad
-      self.autoDetectTryAll = autoDetectTryAll
+      self.autoDetectTryAll = autoDetectTryAll and not forcePsuLoad
 
       if self.addrFunc:
          self.addrFunc(0x00) # workaround to configure a bus wide parameter
