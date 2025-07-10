@@ -21,6 +21,10 @@ class StatusLedFeature(PollDaemonFeature):
    def getStatus(self, platform, led):
       return LedColor.GREEN
 
+   def getScmStatus(self, platform, led):
+      # TODO: implement logic for SCM leds
+      return LedColor.GREEN
+
    def getAllFansStatus(self, platform, led):
       inv = platform.getInventory()
       fans = []
@@ -59,6 +63,7 @@ class StatusLedFeature(PollDaemonFeature):
          'psu_status': self.getAllPsusStatus,
          'fabric_status': self.getAllFabricsStatus,
          'linecard_status': self.getAllLinecardsStatus,
+         'scm': self.getScmStatus,
       }
       policy = ledPolicies.get(name)
       return policy
