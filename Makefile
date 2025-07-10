@@ -155,7 +155,8 @@ install-py3whl:
 
 install-drivers:
 	$(MKDIR) -p $(DRV_DESTDIR)
-	$(CP) $(MODULE_SRC)/*.ko $(DRV_DESTDIR)
+	# this step should perform the module signature  `modules_sign`
+	$(MAKE) -C $(KERNEL_SRC) M=$(MODULE_SRC) INSTALL_MOD_PATH=$(DESTDIR) modules_install
 
 install-bin:
 	$(MKDIR) -p $(BIN_DESTDIR)
