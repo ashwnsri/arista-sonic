@@ -13,6 +13,7 @@
 #include <linux/err.h>
 #include <linux/mutex.h>
 #include <linux/sysfs.h>
+#include <linux/version.h>
 
 /* Addresses to scan */
 static const unsigned short normal_i2c[] = { 0x48, 0x49, 0x4a, 0x4b,
@@ -441,13 +442,16 @@ static int tmp468_detect(struct i2c_client *client,
 		return -ENODEV;
 	}
 
-	strlcpy(info->type, tmp468_id[kind].name, I2C_NAME_SIZE);
+	strscpy(info->type, tmp468_id[kind].name, I2C_NAME_SIZE);
 
 	return 0;
 }
 
-static int tmp468_probe(struct i2c_client *client,
-			const struct i2c_device_id *id)
+static int tmp468_probe(struct i2c_client *client
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+			, const struct i2c_device_id *id
+#endif
+			)
 {
 	static const char * const names[] = {
 		"TMP468"
@@ -464,7 +468,11 @@ static int tmp468_probe(struct i2c_client *client,
 
 	data->client = client;
 	mutex_init(&data->update_lock);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 	data->kind = id->driver_data;
+#else
+	data->kind = (uintptr_t)i2c_get_match_data(client);
+#endif
 
 	/* Initialize the TMP468 chip */
 	status = tmp468_init_client(data, client);

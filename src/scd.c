@@ -1737,18 +1737,35 @@ static int scd_dump_open( struct inode *inode, struct file *file ) {
    return single_open(file, scd_dump, NULL);
 }
 
+/*
+ * commit 75a2d4226b53 ("driver core: class: mark the struct class for sysfs
+ * callbacks as constant") in v6.4
+ */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 static ssize_t disable_nmi_store(struct class *cls, struct class_attribute *attr,
-                                     const char *buf, size_t count)
+                                const char *buf, size_t count)
+#else
+static ssize_t disable_nmi_store(const struct class *cls,
+                                const struct class_attribute *attr,
+                                const char *buf, size_t count)
+#endif
 {
    nmi_disabled = true;
    printk(KERN_INFO "Disabled SCD NMI handler\n");
    return count;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 static ssize_t crc_error_panic_store(struct class *cls,
                                      struct class_attribute *attr,
                                      const char *buf,
                                      size_t count)
+#else
+static ssize_t crc_error_panic_store(const struct class *cls,
+                                     const struct class_attribute *attr,
+                                     const char *buf,
+                                     size_t count)
+#endif
 {
    int ret;
 
@@ -1782,7 +1799,6 @@ ATTRIBUTE_GROUPS(scd_class);
 
 static struct class scd_class =
 {
-   .owner = THIS_MODULE,
    .name = SCD_MODULE_NAME,
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
    .class_attrs = scd_class_attrs,

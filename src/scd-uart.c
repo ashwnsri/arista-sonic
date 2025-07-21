@@ -152,6 +152,8 @@ static void scd_uart_stop_tx(struct uart_port *port)
    sp->tx_started = false;
 }
 
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 9, 0)
 static void scd_uart_transmit_chars(struct uart_port *port)
 {
    struct circ_buf *xmit = &port->state->xmit;
@@ -189,6 +191,45 @@ static void scd_uart_transmit_chars(struct uart_port *port)
    if (uart_circ_empty(xmit))
       scd_uart_stop_tx(port);
 }
+#else
+static void scd_uart_transmit_chars(struct uart_port *port)
+{
+   struct tty_port *tp = &port->state->port;
+   struct scd_uart_port *sp = to_scd_uart_port(port);
+   union uart_tx_sm_res res = scd_read_tx_sm_res(sp);
+   union uart_tx_sm_req req = { .reg = 0 };
+   char data;
+
+   uart_dbg(port, "transmit chars pending=%u\n", kfifo_len(&tp->xmit_fifo));
+
+   req.push = 1;
+   req.st = 1;
+
+   while (res.nrs < SCD_UART_FIFO_DEPTH) {
+      if (port->x_char) {
+         req.d = port->x_char;
+         scd_write_tx_sm_req(sp, req);
+         port->icount.tx++;
+         port->x_char = 0;
+      }
+
+      if (uart_tx_stopped(port) || !kfifo_get(&tp->xmit_fifo, &data))
+         break;
+
+      req.d = data;
+      scd_write_tx_sm_req(sp, req);
+      port->icount.tx++;
+
+      res.nrs++;
+   }
+
+   if (kfifo_len(&tp->xmit_fifo) < WAKEUP_CHARS)
+      uart_write_wakeup(port);
+
+   if (kfifo_is_empty(&tp->xmit_fifo))
+      scd_uart_stop_tx(port);
+}
+#endif
 
 static void scd_uart_flush_rx_queue(struct uart_port *port)
 {

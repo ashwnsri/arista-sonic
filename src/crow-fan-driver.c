@@ -491,7 +491,7 @@ fail:
     return err;
 }
 
-void crow_print_version(struct i2c_client *client)
+static void crow_print_version(struct i2c_client *client)
 {
     char version;
     int err;
@@ -530,8 +530,11 @@ static void crow_force_fan_speed(struct i2c_client *client, u8 pwm)
    }
 }
 
-static int crow_cpld_probe(struct i2c_client *client,
-                           const struct i2c_device_id *id)
+static int crow_cpld_probe(struct i2c_client *client
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+                           , const struct i2c_device_id *id
+#endif
+                          )
 {
     int err;
     struct device *dev = &client->dev;

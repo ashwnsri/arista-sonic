@@ -524,7 +524,7 @@ static u32 scd_fan_led_read(struct scd_fan *fan) {
    return val;
 }
 
-void scd_fan_led_write(struct scd_fan *fan, u32 val)
+static void scd_fan_led_write(struct scd_fan *fan, u32 val)
 {
    struct scd_fan_group *group = fan->fan_group;
    u32 addr_g = FAN_ADDR(group, green_led);

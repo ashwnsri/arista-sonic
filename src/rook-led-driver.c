@@ -226,8 +226,11 @@ leds_pca9555_remove(struct i2c_client *client)
 #endif
 }
 
-static int leds_pca9555_probe(struct i2c_client *client,
-			      const struct i2c_device_id *id)
+static int leds_pca9555_probe(struct i2c_client *client
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+			      , const struct i2c_device_id *id
+#endif
+			     )
 {
 	int i, err;
 	struct pca9555_chip *chip;

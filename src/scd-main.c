@@ -21,6 +21,7 @@
 #include <linux/version.h>
 #include <linux/hwmon.h>
 #include <linux/hwmon-sysfs.h>
+#include <linux/pci.h>
 #include <linux/gpio.h>
 #include <linux/stat.h>
 

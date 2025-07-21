@@ -892,8 +892,11 @@ cpld_remove(struct i2c_client *client)
 #endif
 }
 
-static int cpld_probe(struct i2c_client *client,
-                      const struct i2c_device_id *id)
+static int cpld_probe(struct i2c_client *client
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+                      , const struct i2c_device_id *id
+#endif
+                      )
 {
    struct device *dev = &client->dev;
    struct device *hwmon_dev;
@@ -913,7 +916,12 @@ static int cpld_probe(struct i2c_client *client,
    i2c_set_clientdata(client, cpld);
    cpld->client = client;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
    cpld->info = &cpld_infos[id->driver_data];
+#else
+   cpld->info = &cpld_infos[(uintptr_t)i2c_get_match_data(client)];
+#endif
+
    mutex_init(&cpld->lock);
 
    cpld->groups[0] = &cpld_group;

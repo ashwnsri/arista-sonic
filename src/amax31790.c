@@ -25,6 +25,7 @@
 #include <linux/jiffies.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/version.h>
 
 /* MAX31790 registers */
 #define MAX31790_REG_GLOBAL_CONFIG	0x00
@@ -436,13 +437,17 @@ static int max31790_init_client(struct i2c_client *client,
 	return err;
 }
 
-static int max31790_probe(struct i2c_client *client,
-			  const struct i2c_device_id *id)
+static int max31790_probe(struct i2c_client *client
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+			, const struct i2c_device_id *id
+#endif
+			 )
 {
 	struct i2c_adapter *adapter = client->adapter;
 	struct device *dev = &client->dev;
 	struct max31790_data *data;
 	struct device *hwmon_dev;
+	const struct max31790_fan_config *config;
 	int err;
 
 	if (!i2c_check_functionality(adapter,
@@ -459,8 +464,12 @@ static int max31790_probe(struct i2c_client *client,
 	/*
 	 * Initialize the max31790 chip
 	 */
-	err = max31790_init_client(client, data,
-				   (const struct max31790_fan_config *)id->driver_data);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+	config = (const struct max31790_fan_config *)id->driver_data;
+#else
+	config = (const struct max31790_fan_config *)i2c_get_match_data(client);
+#endif
+	err = max31790_init_client(client, data, config);
 	if (err)
 		return err;
 

@@ -106,7 +106,7 @@ static int mdio_master_wait_response(struct scd_mdio_master *master)
    return -EAGAIN;
 }
 
-u8 mdio_master_get_req_id(struct scd_mdio_master *master)
+static u8 mdio_master_get_req_id(struct scd_mdio_master *master)
 {
    return master->req_id++;
 }
