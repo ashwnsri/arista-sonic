@@ -214,9 +214,11 @@ class CoolingZone(object):
 
       logging.debug('%s: using %s to set fan speed', self, info.thermal)
 
-      # Skip any fan speed change if the temperature to target delta is below
-      # 5% of the target to overheat range.
-      if abs(info.deltap * 100.) < 5.:
+      # Skip any fan speed adjustment if the temperature is between some
+      # percentage of target to overheat delta
+      under = Config().cooling_adjust_under
+      over = Config().cooling_adjust_over
+      if under < info.deltap * 100. < over:
          return lastSpeed
 
       if info.delta < 0:

@@ -426,11 +426,12 @@ class CoolingEntityManager(object):
             print(f'{obj.__class__.__name__} "{obj.name}" {" ".join(attrs)}')
 
    def gc(self):
+      self.update()
+
       self._gc_count += 1
       if self._gc_count < Config().cooling_gc_count:
          return
 
-      self.update()
       for col in [self._fans, self._psus, self._thermals, self._xcvrs]:
          todelete = []
          for key, obj in col.items():
