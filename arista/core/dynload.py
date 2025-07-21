@@ -1,6 +1,12 @@
 
 import importlib
 import pkgutil
+import sys
+
+if sys.version_info < (3, 12):
+   get_module_loader = lambda finder, name: finder.find_module(name)
+else:
+   get_module_loader = lambda finder, name: finder.find_spec(name).loader
 
 def walk_packages(path=None, prefix='', onerror=None):
    """Implementation from https://github.com/python/cpython/pull/11956"""
@@ -14,10 +20,8 @@ def walk_packages(path=None, prefix='', onerror=None):
       yield info
 
       if info.ispkg:
-         # loader = info.module_finder.find_module('arista.cli.args.' + info.name)
-         loader = info.module_finder.find_module(info.name)
+         loader = get_module_loader(info.module_finder, info.name)
          try:
-            # module = loader.load_module('arista.cli.args.' + info.name)
             module = loader.load_module(info.name)
          except ImportError:
             if onerror is not None:
