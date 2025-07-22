@@ -11,7 +11,6 @@ from ..components.cpld import (
    SysCpldCommonRegistersV2,
    SysCpldReloadCauseRegistersV2,
 )
-from ..components.cpu.crow import CrowCpuFreqQuirk
 from ..components.dpm.ucd import Ucd90120A, UcdGpi
 from ..components.max6658 import Max6658
 from ..components.psu.delta import DPS495CB, DPS500AB
@@ -154,7 +153,7 @@ class Lodoga(LodogaBase):
    SID = ['Lodoga', 'LodogaSsd']
    SKU = ['DCS-7050CX3-32S', 'DCS-7050CX3-32S-SSD']
    PSU_CLS = [DPS495CB, DS495SPE]
-   LODOGA_QUIRKS = [CrowCpuFreqQuirk()]
+   LODOGA_QUIRKS = []
 
    class SmBusAddresses(object):
       TS  = 9
