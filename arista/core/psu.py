@@ -109,6 +109,8 @@ class PsuModel:
    AUTODETECT_IPMI = False
    AUTODETECT_PMBUS = True
 
+   SUPPORT_SMBUS_PING = True
+
    def __init__(self, identifier):
       self.identifier = identifier
 
@@ -136,6 +138,7 @@ class PsuManager:
          if isinstance(value, type) and issubclass(value, PsuModel) and \
             value != PsuModel:
             self.psus_.append(value)
+      self.psus_ = list(sorted(self.psus_, key=lambda p: not p.SUPPORT_SMBUS_PING))
 
    def loadPsuModels(self):
       if self.modules is not None:
@@ -193,7 +196,8 @@ class PsuManager:
 
             if not detector.exists():
                # No PMBus device found at the address expected for this model
-               continue
+               if model.SUPPORT_SMBUS_PING or not detector.checkId():
+                  continue
 
             if not detectorCached:
                logging.debug('searching for psu vendor "%s" model "%s"',

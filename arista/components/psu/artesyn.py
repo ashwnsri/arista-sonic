@@ -51,6 +51,7 @@ class DS460(ArtesynPsu):
 
 class CSU500DP(ArtesynPsu):
    CAPACITY = 500
+   SUPPORT_SMBUS_PING = False
    DESCRIPTION = psuDescHelper(
       sensors=[
          ('inlet', Position.INLET, 60, 65, 69),

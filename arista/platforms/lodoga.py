@@ -14,7 +14,7 @@ from ..components.cpld import (
 from ..components.dpm.ucd import Ucd90120A, UcdGpi
 from ..components.max6658 import Max6658
 from ..components.psu.delta import DPS495CB, DPS500AB
-from ..components.psu.artesyn import DS495SPE
+from ..components.psu.artesyn import CSU500DP, DS495SPE
 from ..components.scd import Scd
 
 from ..descs.gpio import GpioDesc
@@ -194,7 +194,7 @@ class LodogaPrime(LodogaBase):
    SKU = ['DCS-7050CX3-32C']
 
    CHASSIS = LodogaPrimeChassis
-   PSU_CLS = [DPS500AB]
+   PSU_CLS = [DPS500AB, CSU500DP]
 
    class SmBusAddresses(object):
       TS  = 0

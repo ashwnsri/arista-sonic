@@ -49,6 +49,13 @@ class PsuPmbusDetect(I2cDevDriver):
          self.exists_ = self.smbusPing()
       return self.exists_
 
+   def checkId(self):
+      try:
+         self.id()
+         return True
+      except IOError:
+         return False
+
    def _tryReadBlockStr(self, reg, default='N/A'):
       try:
          return self.read_block_data_str(reg)
