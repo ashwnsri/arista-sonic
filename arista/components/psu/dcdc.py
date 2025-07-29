@@ -8,6 +8,8 @@ from .helper import psuDescHelper, Position
 
 class FlexBmr313(PsuModel):
    CAPACITY = 1000
+   AUTODETECT_PMBUS = False
+
    MANUFACTURER = ''.join(chr(c) for c in [0x1a, 0x0])
    PMBUS_ADDR = 0x10
    PMBUS_CLS = PmbusPsu
