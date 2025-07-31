@@ -11,16 +11,16 @@ class ShowXcvr(Renderer):
       ctx = DiagContext()
       data = []
       for inventory, _ in show.inventories:
-         for name, xcvr in inventory.getXcvrSlots().items():
+         for xcvr in inventory.getXcvrSlots().values():
             data.append(xcvr.__diag__(ctx))
-      return data
+      return sorted(data, key=lambda x: x['id'])
 
    def renderText(self, show):
       data = self.data(show)
 
       Table([
          Col('Id', 'id', 3),
-         Col('Type', 'xcvr.type', 7),
+         Col('Type', 'xcvr.type', 9),
          Col('Present', 'present', 7),
          Col('LpMode', 'lpmode', 6),
          Col('Reset', 'reset.value', 6),
