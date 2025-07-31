@@ -120,4 +120,7 @@ class Component(LegacyComponent):
       for quirk in self.quirks:
          if quirk.DELAYED == delayed:
             logging.info('%s: quirk: %s', self, quirk)
-            quirk.run(self)
+            try:
+               quirk.run(self)
+            except Exception: # pylint: disable=broad-except
+               logging.exception('%s: quirk: %s failed', self, quirk)

@@ -29,3 +29,6 @@ class Raa228228(I2cComponent):
 
    def setup(self):
       self.applyQuirks()
+
+class Raa228926(Raa228228):
+   pass
