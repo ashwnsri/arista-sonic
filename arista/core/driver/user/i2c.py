@@ -4,13 +4,11 @@ from contextlib import closing
 from .gpio import GpioFuncImpl
 
 from ... import utils
-from ...log import getLogger
+from ...log_helper import logIoRead, logIoWrite
 from ...i2c_utils import I2cMsg
 from ...utils import SMBus
 
 from . import UserDriver
-
-logging = getLogger(__name__)
 
 class I2cDevDriver(UserDriver):
 
@@ -68,27 +66,42 @@ class I2cDevDriver(UserDriver):
          return False
       return True
 
+   @logIoWrite
+   def send_byte(self, data):
+      return self.bus.write_byte(self.addr.address, data)
+
+   @logIoRead
+   def recv_byte(self):
+      return self.bus.read_byte(self.addr.address)
+
+   @logIoRead
    def read_byte_data(self, reg):
       return self.bus.read_byte_data(self.addr.address, reg)
 
+   @logIoWrite
    def write_byte_data(self, reg, data):
       return self.bus.write_byte_data(self.addr.address, reg, data)
 
+   @logIoRead
    def read_word_data(self, reg):
       return self.bus.read_word_data(self.addr.address, reg)
 
+   @logIoWrite
    def write_word_data(self, reg, data):
       return self.bus.write_word_data(self.addr.address, reg, data)
 
+   @logIoWrite
    def write_block_data(self, reg, data):
       return self.bus.write_block_data(self.addr.address, reg, data)
 
+   @logIoRead
    def read_block_data(self, reg):
       if self.addr.supportSmbusBlock:
          return self.bus.read_block_data(self.addr.address, reg)
       data = self.read_i2c_block_data(reg)
       return data[1:data[0] + 1]
 
+   @logIoRead
    def read_i2c_block_data(self, reg, length=32):
       return self.bus.read_i2c_block_data(self.addr.address, reg, length)
 
