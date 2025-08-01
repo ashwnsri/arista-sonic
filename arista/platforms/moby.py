@@ -19,11 +19,23 @@ from ..components.psu.dcdc import (
 from ..components.scd import Scd, ScdCause, ScdReloadCauseRegisters
 from ..components.xcvr import CmisEeprom
 
+# from ..descs.led import LedColor, LedDesc
+from ..descs.gpio import GpioDesc
 from ..descs.reset import ResetDesc
 from ..descs.sensor import Position, SensorDesc
 from ..descs.xcvr import Osfp800, Qsfp28, Xcvr as XcvrDesc
 
 from .cpu.redstart import RedstartCpu
+
+class Cartridge:
+   def __init__(self, index, eeprom, interrupt, wp):
+      self.index = index
+      self.eeprom = eeprom
+      self.interrupt = interrupt
+      self.wp = wp
+
+   def getPresence(self):
+      return not self.interrupt.asserted()
 
 class BackplaneImpl(EthernetImpl):
    def __init__(self, eeprom, slot):
@@ -34,16 +46,17 @@ class BackplaneImpl(EthernetImpl):
       return 'backplane'
 
 class PaladinConnector(XcvrSlot):
-   def __init__(self, *args, eeprom=None, **kwargs):
+   def __init__(self, *args, cartridge=None, **kwargs):
       super().__init__(*args, **kwargs)
       self.slotInv = self.inventory.addEthernetSlot(EthernetSlotImpl(self))
-      self.xcvrInv = self.inventory.addEthernet(BackplaneImpl(eeprom, self.slotInv))
-      self.xcvr = eeprom
+      self.xcvrInv = self.inventory.addEthernet(BackplaneImpl(cartridge.eeprom,
+                                                              self.slotInv))
+      self.xcvr = cartridge.eeprom
+      self.cartridge = cartridge
       self.leds = []
 
    def getPresence(self):
-      # TODO: use presencGpio in the future
-      return True
+      return self.cartridge.getPresence()
 
 class PaladinHd(XcvrDesc):
    LANES = 48
@@ -120,11 +133,20 @@ class Moby(FixedSystem):
          (0x6070, 'psu_status'),
       ])
 
-      self.cartridge_eeproms = [
-         scd.newComponent(
-            CmisEeprom,
-            addr=scd.i2cAddr(12 + i, 0x50),
-            portName=f'cartridge{i}',
+      intrs = [
+         scd.createInterrupt(addr=0x3000, num=0),
+      ]
+
+      self.cartridges = [
+         Cartridge(
+            index=i,
+            eeprom=scd.newComponent(
+               CmisEeprom,
+               addr=scd.i2cAddr(12 + i, 0x50),
+               portName=f'cartridge{i}',
+            ),
+            interrupt=intrs[0].getInterruptBit(f'phd{i + 1}_det_l', 15 + i),
+            wp=scd.addGpio(GpioDesc(f'phd{i + 1}_wp', addr=0x2D00, bit=i)),
          ) for i in range(0, self.BACKPLANE_CARTRIDGES)
       ]
 
@@ -135,7 +157,7 @@ class Moby(FixedSystem):
             PaladinConnector,
             name=f'back{i}',
             slotId=17 + i,
-            eeprom=self.cartridge_eeproms[-(1 + i // 2)],
+            cartridge=self.cartridges[-(1 + i // 2)],
          ) for i in range(0, self.BACKPLANE_CONNECTORS)
       ]
 

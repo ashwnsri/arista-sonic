@@ -101,6 +101,9 @@ class ScdInterrupt(Interrupt):
    def clear(self):
       self.reg.clearMask(self.bit)
 
+   def asserted(self):
+      return self.reg.getStatus(self.bit)
+
    def getName(self):
       return self.name
 
@@ -131,22 +134,28 @@ class ScdInterruptRegister():
       try:
          with self.scd.getMmap() as mmap:
             res = mmap.read32(reg)
-            return hex(res)
+            return res
       except RuntimeError as e:
          logging.error("read register %s: %s", reg, e)
          return None
+
+   def getStatus(self, bit):
+      res = self.readReg(self.statusAddr)
+      if res is None:
+         return None
+      return bool(res & (1 << bit))
 
    def setMask(self, bit):
       mask = 0 | 1 << bit
       res = self.readReg(self.setAddr)
       if res is not None:
-         self.setReg(self.setAddr, (mask | int(res, 16)) & 0xffffffff)
+         self.setReg(self.setAddr, (mask | res) & 0xffffffff)
 
    def clearMask(self, bit):
       mask = 0 | 1 << bit
       res = self.readReg(self.setAddr)
       if res is not None:
-         self.setReg(self.clearAddr, (mask | ~int(res, 16)) & 0xffffffff)
+         self.setReg(self.clearAddr, (mask | ~res) & 0xffffffff)
 
    def setup(self):
       if not Config().init_irq:
