@@ -88,7 +88,14 @@ class Psu(PsuBase):
 
    def get_current(self):
       rail = self.rail
-      return round(rail.getCurrent(), 3) if rail else None
+      if not rail:
+         return None
+      power = self.get_power()
+      current = rail.getCurrent()
+      # Zero power means zero current (filters leakage and sensor noise)
+      if power is None or abs(power) < 1.0:  # Less than 1Watt
+         return 0.0
+      return round(current, 3)
 
    def get_power(self):
       rail = self.rail
