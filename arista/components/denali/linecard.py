@@ -109,7 +109,6 @@ class DenaliLinecard(DenaliLinecardBase):
       self.gpio1.dpEcbOn(True)
       time.sleep(0.1)
       self.gpio1.scdReset(False)
-      self.gpio1.pcieUpstream(False)
       waitFor(self.poweredOn, "card to turn on",
               wait=2000, interval=100)
 
@@ -117,7 +116,6 @@ class DenaliLinecard(DenaliLinecardBase):
       self.gpio1.dpEcbOn(False)
       self.gpio1.cpEcbOn(False)
       self.gpio1.scdReset(True)
-      self.gpio1.pcieUpstream(True)
       waitFor(lambda: (not self.poweredOn()), "card to turn off")
 
    def powerStandbyDomainIs(self, on):
@@ -239,7 +237,7 @@ class DenaliLinecard(DenaliLinecardBase):
 
 class GpioRegisterMap(RegisterMap):
    BANK0 = GpioRegister(0x0,
-      RegBitField(1, 'standbyPowerGood', ro=True),
+      RegBitField(0, 'standbyPowerGood', ro=True),
       RegBitField(1, 'tempAlert', flip=True),
       RegBitField(2, 'powerGood'),
       RegBitField(4, 'powerCycle', ro=False),
@@ -250,7 +248,6 @@ class GpioRegisterMap(RegisterMap):
       RegBitField(1, 'dpEcbOn', ro=False),
       RegBitField(2, 'statusGreen', ro=False, flip=True),
       RegBitField(3, 'statusRed', ro=False, flip=True),
-      RegBitField(4, 'pcieUpstream', ro=False),
       RegBitField(5, 'lcpuMode', ro=False),
       RegBitField(6, 'pcieReset', ro=False, flip=True),
       RegBitField(7, 'scdReset', ro=False, flip=True),
