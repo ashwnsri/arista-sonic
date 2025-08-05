@@ -1,7 +1,7 @@
 
-from .log import getLogger
+import functools
 
-logging = getLogger(__name__)
+from .log import getLogger
 
 class LazyArgsStr:
    def __init__(self, args, kwargs):
@@ -20,20 +20,26 @@ class LazyArgsStr:
       ) if s)
 
 def logIoWrite(func):
+   logger = getLogger(func.__module__)
+
+   @functools.wraps(func)
    def wraps(self, *args, **kwargs):
-      logging.io('%s.%s(%s)', self, func.__name__, LazyArgsStr(args, kwargs))
+      logger.io('%s.%s(%s)', self, func.__name__, LazyArgsStr(args, kwargs))
       return func(self, *args, **kwargs)
    return wraps
 
 def logIoRead(func):
+   logger = getLogger(func.__module__)
+
+   @functools.wraps(func)
    def wraps(self, *args, **kwargs):
       try:
          data = func(self, *args, **kwargs)
-         logging.io('%s.%s(%s): %s',
+         logger.io('%s.%s(%s): %s',
                     self, func.__name__, LazyArgsStr(args, kwargs), data)
          return data
       except Exception:
-         logging.io('%s.%s(%s): ERROR',
+         logger.io('%s.%s(%s): ERROR',
                     self, func.__name__, LazyArgsStr(args, kwargs))
          raise
    return wraps
