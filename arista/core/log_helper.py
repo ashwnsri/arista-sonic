@@ -9,8 +9,13 @@ class LazyArgsStr:
       self.kwargs = kwargs
 
    def __str__(self):
+      def format_arg(a):
+         if isinstance(a, int):
+            return f'{a:#04x}'
+         return str(a)
+
       return ', '.join(s for s in (
-         ', '.join(f'{a:#04x}' for a in self.args),
+         ', '.join(format_arg(a) for a in self.args),
          ', '.join(f'{k}={v}' for k, v in self.kwargs.items()),
       ) if s)
 
