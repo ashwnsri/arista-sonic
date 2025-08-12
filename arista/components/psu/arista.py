@@ -53,6 +53,20 @@ class Pwr591(AristaPsu):
       PsuIdent('PWR-00591', 'PWR-2411-MC-RED', Airflow.EXHAUST),
    ]
 
+class Pwr634(AristaPsu):
+   CAPACITY = 560
+   DESCRIPTION = psuDescHelper(
+      sensors=[
+         ('inlet', Position.OTHER, 60, 65, 70),
+         ('secondary hotspot', Position.OTHER, 110, 120, 130),
+         ('primary hotspot', Position.OTHER, 110, 115, 120),
+      ],
+      maxRpm=25500,
+   )
+   IDENTIFIERS = [
+      PsuIdent('PWR-00634', 'PWR-00634-AC-BLUE', Airflow.EXHAUST),
+   ]
+
 class Pwr663(AristaPsu):
    CAPACITY = 2400
    DESCRIPTION = psuDescHelper(
