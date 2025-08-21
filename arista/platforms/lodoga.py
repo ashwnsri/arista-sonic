@@ -2,13 +2,16 @@ from ..core.fixed import FixedSystem
 from ..core.platform import registerPlatform
 from ..core.port import PortLayout
 from ..core.psu import PsuSlot
-from ..core.register import Register, RegBitField
+from ..core.register import (
+   Register,
+   RegisterMap,
+   RegBitField,
+)
 from ..core.utils import incrange
 
 from ..components.asic.xgs.trident3 import Trident3
 from ..components.cpld import (
    SysCpldCause,
-   SysCpldCommonRegistersV2,
    SysCpldReloadCauseRegistersV2,
 )
 from ..components.dpm.ucd import Ucd90120A, UcdGpi
@@ -38,8 +41,26 @@ class LodogaCpldRegisters(CrowCpldRegisters):
 class LodogaPrimeChassis(Yuba):
    FAN_SLOTS = 2
 
-class LodogaPrimeCpldRegisters(SysCpldCommonRegistersV2):
-   pass
+class LodogaPrimeCpldRegisters(RegisterMap):
+   MINOR = Register(0x00, name='revisionMinor')
+   REVISION = Register(0x01, name='revision')
+   SCRATCHPAD = Register(0x02, name='scratchpad', ro=False)
+
+   PWR_CTRL_STS = Register(0x05,
+      RegBitField(7, 'dpPower', ro=False),
+      RegBitField(0, 'switchCardPowerGood'),
+   )
+   SCD_CTRL_STS = Register(0x0A,
+      RegBitField(5, 'scdReset', ro=False),
+      RegBitField(1, 'scdInitDone'),
+      RegBitField(0, 'scdConfDone'),
+   )
+   PWR_CYC_EN = Register(0x11,
+      RegBitField(2, 'powerCycleOnCrc', ro=False),
+   )
+   RT_FAULT_0 = Register(0x46,
+      RegBitField(2, 'scdCrcError'),
+   )
 
 class LodogaBase(FixedSystem):
    LODOGA_QUIRKS = []
