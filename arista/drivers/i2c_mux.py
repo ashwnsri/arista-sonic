@@ -11,13 +11,19 @@ class I2cMuxBus(object):
       self.bus_ = None
       self.name_ = None
 
+   def __int__(self):
+      return self.bus
+
    def resolvePath(self):
       channelPath = os.path.join(
           self.parent.getSysfsPath(),
           f'channel-{self.channel}',
       )
-      self.name_ = os.path.basename(os.readlink(channelPath))
-      self.bus_ = i2cBusFromName(self.name_)
+      targetDevicePath = os.path.realpath(channelPath)
+      nameFilePath = os.path.join(targetDevicePath, 'name')
+      with open(nameFilePath, encoding='utf-8') as f:
+         self.name_ = f.read().strip()
+      self.bus_ = i2cBusFromName(self.name_, force=True)
 
    @property
    def bus(self):
@@ -34,5 +40,5 @@ class I2cMuxKernelDriver(I2cKernelDriver):
    I2C_BUS_CLS = I2cMuxBus
 
    def getBus(self, channel):
-      assert 0 < channel <= self.NUM_CHANNELS
+      assert 0 <= channel < self.NUM_CHANNELS
       return self.I2C_BUS_CLS(self, channel)
