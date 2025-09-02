@@ -35,7 +35,7 @@ class LodogaCpldRegisters(CrowCpldRegisters):
        RegBitField(2, 'powerCycleOnCrc', ro=False),
    )
    FAULT_STATUS = Register(0x19,
-       RegBitField(6, 'scdSeuError'),
+       RegBitField(6, 'scdCrcError'),
    )
 
 class LodogaPrimeChassis(Yuba):
