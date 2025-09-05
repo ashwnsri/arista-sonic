@@ -1,6 +1,7 @@
 from ..core.fixed import FixedSystem
 from ..core.platform import registerPlatform
 from ..core.port import PortLayout
+from ..core.types import MdioSpeed
 from ..core.utils import incrange
 from ..core.psu import PsuSlot
 
@@ -8,6 +9,7 @@ from ..components.scd import Scd
 from ..components.asic.dnx.jericho3 import Jericho3
 from ..components.dpm.adm1266 import Adm1266, AdmCause
 from ..components.lm75 import Tmp75
+from ..components.phy.screamingeagle import ScreamingEagle
 
 from ..descs.gpio import GpioDesc
 from ..descs.reset import ResetDesc
@@ -49,6 +51,18 @@ class CitrineBase(FixedSystem):
       port = self.cpu.getPciPort(self.cpu.PCI_PORT_SCD0)
       scd = port.newComponent(Scd, addr=port.addr)
       self.scd = scd
+
+      self.scd.addMdioMasterRange(0x9000, 16, speed=MdioSpeed.S10)
+      for i in range(16):
+         phyId = i + 1
+         self.inventory.addPhy(ScreamingEagle(
+            phyId=phyId,
+            mdios=[self.scd.addMdio(i, 0), self.scd.addMdio(i, 1)],
+            reset=self.scd.addReset(
+               ResetDesc('phy%d_reset' % phyId, addr=0x4000, bit=5 + i)
+            )
+         ))
+
       scd.createWatchdog()
       scd.setMsiRearmOffset(0x180)
       scd.addSmbusMasterRange(0x8000, 9, 0x80)
