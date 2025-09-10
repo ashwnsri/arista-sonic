@@ -12,10 +12,8 @@ from ..components.lm75 import Tmp75
 from ..components.max6581 import Max6581
 from ..components.minke import Minke
 from ..components.pci import EcrcPciQuirk
-from ..components.psu.dcdc import (
-   DeltaU50su, DeltaU50suAddr18,
-   FlexBmr313, FlexBmr313Addr18,
-)
+from ..components.psu.dcdc import MobyDcDc, MobyDcDcAddr18
+
 from ..components.scd import Scd, ScdCause, ScdReloadCauseRegisters
 from ..components.xcvr import CmisEeprom
 
@@ -162,8 +160,8 @@ class Moby(FixedSystem):
       ]
 
       for psuId, psuClasses in [
-         (1, [FlexBmr313, DeltaU50su]),
-         (2, [FlexBmr313Addr18, DeltaU50suAddr18])
+         (1, [MobyDcDc]),
+         (2, [MobyDcDcAddr18])
       ]:
          addrFunc=lambda addr: scd.i2cAddr(16, addr, t=3, datr=2, datw=3)
          self.scd.newComponent(
@@ -172,7 +170,7 @@ class Moby(FixedSystem):
             addrFunc=addrFunc,
             presentGpio=True,
             psus=psuClasses,
-            autoDetectTryAll=False
+            forcePsuLoad=True
          )
 
       port = self.cpu.getPciPort(self.cpu.PCI_PORT_SCD1)
