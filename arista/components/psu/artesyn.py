@@ -20,6 +20,7 @@ class DS495SPE(ArtesynPsu):
          ('inlet', Position.INLET, 60, 80, 85),
          ('outlet', Position.OUTLET, 60, 80, 85),
       ],
+      maxRpm=22200,
    )
    IDENTIFIERS = [
       PsuIdent('DS495SPE-3-401 ', 'PWR-500AC-F', Airflow.EXHAUST),
