@@ -19,3 +19,9 @@ class Fixed100AC(FixedPsuModel):
    IDENTIFIERS = [
       PsuIdent('PWR-545-AC', 'PWR-545-AC', Airflow.EXHAUST)
    ]
+
+class Fixed240DC(FixedPsuModel):
+   CAPACITY = 240
+   IDENTIFIERS = [
+      PsuIdent('PWR-638-DC', 'PWR-638-DC', Airflow.EXHAUST)
+   ]

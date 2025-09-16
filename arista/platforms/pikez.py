@@ -7,7 +7,7 @@ from ..core.types import I2cAddr, PciAddr
 from ..core.utils import incrange
 
 from ..components.asic.xgs.trident3 import Trident3X2
-from ..components.psu.fixed import Fixed100AC
+from ..components.psu.fixed import Fixed100AC, Fixed240DC
 from ..components.scd import Scd, ScdCause
 from ..components.vrm import Vrm, VrmDetector
 from ..components.vrm.sic450 import Sic450
@@ -24,9 +24,13 @@ class PikeZ1PChassis(FixedChassis):
     FAN_SLOTS = 1
     FAN_COUNT = 2
     PSU_SLOTS = 1
+    PSU_MODEL = Fixed100AC
 
 class PikeZ2PChassis(PikeZ1PChassis):
     PSU_SLOTS = 2
+
+class PikeZ2PMGXChassis(PikeZ2PChassis):
+    PSU_MODEL = Fixed240DC
 
 class PikeZ(FixedSystem):
 
@@ -103,7 +107,7 @@ class PikeZ(FixedSystem):
                 outputOkGpio=statusGpio,
                 forcePsuLoad=True,
                 psus=[
-                    Fixed100AC,
+                    self.CHASSIS.PSU_MODEL,
                 ]
             )
 
@@ -196,3 +200,11 @@ class PikeZ2R(PikeZ):
 
     SID = ['PikeIslandZ-2R']
     SKU = ['CCS-720DT-48S-2R']
+
+@registerPlatform()
+class PikeZMGX2F(PikeZ):
+
+    CHASSIS = PikeZ2PMGXChassis
+
+    SID = ['PikeIslandZ-MGX-2F']
+    SKU = ['CCS-720DT-48S-MGX-2F']
