@@ -2,9 +2,12 @@ from ..core.fixed import FixedSystem
 from ..core.platform import registerPlatform
 from ..core.port import PortLayout
 from ..core.psu import PsuSlot
-from ..core.utils import incrange
+from ..core.quirk import Quirk
+from ..core.register import Register, RegBitField
+from ..core.utils import incrange, inSimulation
 
 from ..components.asic.xgs.tomahawk2 import Tomahawk2
+from ..components.cpld import SysCpldCommonRegistersV2
 from ..components.dpm.ucd import Ucd90120A, UcdGpi
 from ..components.max6658 import Max6658
 from ..components.psu.delta import DPS750AB, DPS1900AB
@@ -17,6 +20,26 @@ from ..descs.sensor import Position, SensorDesc
 from ..descs.xcvr import Qsfp28, Sfp
 
 from .cpu.rook import RookCpu
+
+class GardenaCpldRegisters(SysCpldCommonRegistersV2):
+   PWR_CYC_EN = Register(0x17,
+      RegBitField(0, 'powerCycleOnCrc', ro=False),
+      RegBitField(4, 'powerCycleOnDpPowerFail', ro=False),
+   )
+
+class GardenaDpPwrFailQuirk(Quirk):
+   DELAYED = True
+   def __init__(self, description='enable DP_PWR_FAIL'):
+      self.description = description
+
+   def __str__(self):
+      return self.description
+
+   def run(self, component):
+      if inSimulation():
+         return
+
+      component.driver.regs.powerCycleOnDpPowerFail(True)
 
 @registerPlatform()
 class Gardena(FixedSystem):
@@ -32,7 +55,8 @@ class Gardena(FixedSystem):
    def __init__(self):
       super(Gardena, self).__init__()
 
-      cpu = self.newComponent(RookCpu)
+      cpu = self.newComponent(RookCpu, cpldRegisterCls=GardenaCpldRegisters,
+                              sysCpldQuirks=[GardenaDpPwrFailQuirk()])
       cpu.addCpuDpm()
       cpu.cpld.newComponent(Ucd90120A, addr=cpu.switchDpmAddr(0x34), causes={
          'powerloss': UcdGpi(1),

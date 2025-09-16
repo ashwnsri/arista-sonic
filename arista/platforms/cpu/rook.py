@@ -28,7 +28,8 @@ class RookCpu(Cpu):
    PCI_PORT_SCD0 = PciPortDesc(0x1c, 0)
 
    def __init__(self, mgmtBus=15, fanCpldCls=LaFanCpld, hasLmSensor=True,
-                hasCpuLeds=True, cpldRegisterCls=RookCpldRegisters, **kwargs):
+                hasCpuLeds=True, cpldRegisterCls=RookCpldRegisters,
+                sysCpldQuirks=None, **kwargs):
       super(RookCpu, self).__init__(**kwargs)
 
       self.pciRoot = self.newComponent(PciRoot)
@@ -94,7 +95,8 @@ class RookCpu(Cpu):
       cpld.createPowerCycle()
 
       self.syscpld = self.newComponent(RookSysCpld, addr=cpld.i2cAddr(8, 0x23),
-                                       registerCls=cpldRegisterCls)
+                                       registerCls=cpldRegisterCls,
+                                       quirks=sysCpldQuirks or [])
 
    def addCpuDpm(self, addr=None, causes=None):
       addr = addr or self.cpuDpmAddr()
