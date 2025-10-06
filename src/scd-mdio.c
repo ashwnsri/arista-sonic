@@ -205,6 +205,15 @@ static int scd_mdio_read(struct net_device *netdev, int prtad, int devad, u16 ad
    struct scd_mdio_device *mdio_dev = netdev_priv(netdev);
    struct scd_context *ctx = mdio_dev->mdio_bus->master->ctx;
    int dev_id = mdio_dev->id;
+   int mii_id = scd_mdio_mii_id(prtad, devad, mdio_dev->mode_support);
+   int i;
+
+   for (i = 0; i < MAX_DEVICES_PER_BUS; i++) {
+      if (mdio_dev->mdio_bus->dev_id_to_addr[i] == mii_id) {
+         dev_id = i;
+         break;
+      }
+   }
 
    dev_dbg(get_scd_dev(ctx),
            "scd_mdio_read, dev_id: %04x, prtad: %d, devad: %d, addr: %04x", dev_id,
@@ -218,6 +227,15 @@ static int scd_mdio_write(struct net_device *netdev, int prtad, int devad, u16 a
    struct scd_mdio_device *mdio_dev = netdev_priv(netdev);
    struct scd_context *ctx = mdio_dev->mdio_bus->master->ctx;
    int dev_id = mdio_dev->id;
+   int mii_id = scd_mdio_mii_id(prtad, devad, mdio_dev->mode_support);
+   int i;
+
+   for (i = 0; i < MAX_DEVICES_PER_BUS; i++) {
+      if (mdio_dev->mdio_bus->dev_id_to_addr[i] == mii_id) {
+         dev_id = i;
+         break;
+      }
+   }
 
    dev_dbg(get_scd_dev(ctx),
            "scd_mdio_write, dev_id: %04x, prtad: %d, devad: %d, addr: %04x, "
