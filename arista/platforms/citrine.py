@@ -53,7 +53,7 @@ class CitrineBase(FixedSystem):
       scd = port.newComponent(Scd, addr=port.addr)
       self.scd = scd
 
-      self.scd.addMdioMasterRange(0x9000, 16, speed=MdioSpeed.S10)
+      self.scd.addMdioMasterRange(0x9000, 16, speed=MdioSpeed.S5)
       for i in range(16):
          phyId = i + 1
          self.inventory.addPhy(ScreamingEagle(
