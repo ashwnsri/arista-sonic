@@ -57,7 +57,7 @@ class CitrineBase(FixedSystem):
          phyId = i + 1
          self.inventory.addPhy(ScreamingEagle(
             phyId=phyId,
-            mdios=[self.scd.addMdio(i, 0), self.scd.addMdio(i, 1)],
+            mdios=[self.scd.addMdio(i, 16), self.scd.addMdio(i, 17)],
             reset=self.scd.addReset(
                ResetDesc('phy%d_reset' % phyId, addr=0x4000, bit=5 + i)
             )
@@ -126,7 +126,7 @@ class CitrineBase(FixedSystem):
 
       scd.addXcvrSlots(
          ports=self.PORTS.getAllPorts(),
-         addr=0xA000,
+         addr=0xA010,
          bus=8,
          ledAddr=0x6100,
          ledAddrOffsetFn=lambda x: 0x10,
