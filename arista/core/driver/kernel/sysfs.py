@@ -443,7 +443,10 @@ class TempSysfsImpl(Temp, GenericSysfs):
       return True
 
    def getTemperature(self):
-      return self.input.read()
+      temperature = self.input.read()
+      if self.desc.filter is not None:
+         temperature = self.desc.filter.apply(temperature)
+      return temperature
 
    def getLowThreshold(self):
       if self.reportHwThresh and self.min.exists():

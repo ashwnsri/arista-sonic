@@ -25,4 +25,5 @@ def doCommonDiagCli(components, args):
       pyshell()
    else:
       ident = 3 if args.pretty else None
-      print(json.dumps(diagInfo, indent=ident))
+      classname = lambda obj: obj.__class__.__name__
+      print(json.dumps(diagInfo, indent=ident, default=classname))

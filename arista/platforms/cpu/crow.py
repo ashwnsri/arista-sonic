@@ -15,6 +15,7 @@ from ...components.max6658 import Max6658
 from ...descs.fan import FanDesc, FanPosition
 from ...descs.led import LedDesc, LedColor
 from ...descs.sensor import Position, SensorDesc
+from ...core.filters.ratelimit import RateLimitFilter
 
 class CrowCpu(Cpu):
 
@@ -32,7 +33,8 @@ class CrowCpu(Cpu):
       port = self.pciRoot.rootPort(device=0x18, func=3)
       port.newComponent(K10Temp, addr=port.addr, sensors=[
          SensorDesc(diode=0, name='Cpu temp sensor',
-                    position=Position.OTHER, target=60, overheat=90, critical=95),
+                    position=Position.OTHER, target=60, overheat=90, critical=95,
+                    readFilter=RateLimitFilter(9.5)),
       ])
 
       bus = PiixI2cBus(1, 0x0b20)

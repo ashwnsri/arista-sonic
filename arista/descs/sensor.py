@@ -1,5 +1,7 @@
 
+from typing import Optional
 from ..core.desc import HwDesc
+from ..core.filters.filter_api import Filter
 
 class Position(object):
    INLET = 'inlet'
@@ -12,7 +14,8 @@ class SensorDesc(HwDesc):
 
    def __init__(self, diode, name=None, position=Position.OTHER,
                 target=0., overheat=0., critical=0.,
-                low=0.0, lcritical=-5.0, **kwargs):
+                low=0.0, lcritical=-5.0, readFilter: Optional[Filter]=None,
+                **kwargs):
       super(SensorDesc, self).__init__(**kwargs)
       self.diode = diode
       self.fmt = name
@@ -23,6 +26,7 @@ class SensorDesc(HwDesc):
       self.critical = float(critical)
       self.low = float(low)
       self.lcritical = float(lcritical)
+      self.filter = readFilter
 
    def renderName(self, **kwargs):
       values = kwargs.copy()
