@@ -18,6 +18,10 @@
 
 // scd linux kernel driver public definitions
 
+#ifndef LINUX_DRIVER_SCD_H_
+#define LINUX_DRIVER_SCD_H_
+#include <linux/pci.h>
+
 // Allow an ardma handler set to be registered.
 struct scd_ardma_ops {
    void (*probe)(struct pci_dev *pdev, void *scdregs,
@@ -63,6 +67,8 @@ u32 scd_read_register(struct pci_dev *pdev, u32 offset);
 void scd_write_register(struct pci_dev *pdev, u32 offset, u32 val);
 u64 scd_ptp_timestamp(void);
 void scd_timestamped_panic(const char *msg);
+
+#endif /* !LINUX_DRIVER_SCD_H_ */
 
 // Copyright (c) 2010-2016 Arista Networks, Inc.  All rights reserved.
 // Arista Networks, Inc. Confidential and Proprietary.
