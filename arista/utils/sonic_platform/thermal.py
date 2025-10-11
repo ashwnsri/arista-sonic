@@ -150,10 +150,9 @@ class SfpThermal(ThermalBase):
       return self._cachedThreshInfo
 
    def get_low_threshold(self):
-      threshInfo = self._get_threshold_info()
-      if threshInfo:
-         lowThreshold = threshInfo.get("templowwarning")
-      if not threshInfo or lowThreshold == "N/A":
+      threshInfo = self._get_threshold_info() or {}
+      lowThreshold = threshInfo.get("templowwarning") or "N/A"
+      if lowThreshold == "N/A":
          raise NotImplementedError
       return lowThreshold
 
@@ -161,18 +160,16 @@ class SfpThermal(ThermalBase):
       return False
 
    def get_low_critical_threshold(self):
-      threshInfo = self._get_threshold_info()
-      if threshInfo:
-         lowCritThreshold = threshInfo.get("templowalarm")
-      if not threshInfo or lowCritThreshold == "N/A":
+      threshInfo = self._get_threshold_info() or {}
+      lowCritThreshold = threshInfo.get("templowalarm") or "N/A"
+      if lowCritThreshold == "N/A":
          raise NotImplementedError
       return lowCritThreshold
 
    def get_high_threshold(self):
-      threshInfo = self._get_threshold_info()
-      if threshInfo:
-         highThreshold = threshInfo.get("temphighwarning")
-      if not threshInfo or highThreshold == "N/A":
+      threshInfo = self._get_threshold_info() or {}
+      highThreshold = threshInfo.get("temphighwarning") or "N/A"
+      if highThreshold == "N/A":
          raise NotImplementedError
       return highThreshold
 
@@ -180,10 +177,9 @@ class SfpThermal(ThermalBase):
       return False
 
    def get_high_critical_threshold(self):
-      threshInfo = self._get_threshold_info()
-      if threshInfo:
-         highCritThreshold = threshInfo.get("temphighalarm")
-      if not threshInfo or highCritThreshold == "N/A":
+      threshInfo = self._get_threshold_info() or {}
+      highCritThreshold = threshInfo.get("temphighalarm") or "N/A"
+      if highCritThreshold == "N/A":
          raise NotImplementedError
       return highCritThreshold
 

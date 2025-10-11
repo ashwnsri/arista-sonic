@@ -25,9 +25,12 @@ disable=invalid-name,
         useless-object-inheritance,
         super-with-arguments,
         no-member,
+        too-many-positional-arguments,
+        use-yield-from,
 
         # Compatibility with pylint from older Debian releases
         unrecognized-option,
+        unknown-option-value,
         useless-option-value,
 
 [BASIC]

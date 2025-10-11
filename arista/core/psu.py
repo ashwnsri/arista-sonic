@@ -336,10 +336,6 @@ class PsuSlot(SlotComponent):
       self.components = self.components[:-1]
       return psu
 
-   def maybeLoadPsuDefinitions(self):
-      if self.psusLoaded:
-         return
-
    def load(self, useCache=True, cacheOnly=False):
       if not useCache:
          self.clearCache()
