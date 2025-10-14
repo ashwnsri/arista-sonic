@@ -1,26 +1,38 @@
 from __future__ import absolute_import
 
-from multiprocessing import Process
-
 from ...tests.testing import unittest, patch
+from ...core import utils
 from ...core.fabric import Fabric
 from ...core.linecard import Linecard
 from ...core.modular import Modular
 from ...core.platform import loadPlatforms, getPlatforms
 from ...core.supervisor import Supervisor
-from .. import main
+
+from .. import cleanupSimulation, main, setupSimulation
 
 def fakesleep(_):
    pass
 
 @patch('time.sleep', fakesleep)
 class CliLegacyTest(unittest.TestCase):
+
+   @classmethod
+   def setUpClass(cls):
+      loadPlatforms()
+      cls.platforms = getPlatforms()
+      cls._initialSimulation = utils.simulation
+
+   def setUp(self):
+      setupSimulation()
+
+   def tearDown(self):
+      cleanupSimulation()
+      utils.simulation = self._initialSimulation
+
    def _runMain(self, args, code=0):
-      p = Process(target=main, args=(args,))
-      p.start()
-      p.join()
-      self.assertEqual(p.exitcode, code,
-                       msg='Command %s failed with code %s' % (args, p.exitcode))
+      exitCode = main(args)
+      self.assertEqual(exitCode, code,
+                       msg='Command %s failed with code %s' % (args, exitCode))
 
    def testSysEeprom(self):
       self._runMain(['syseeprom'])
@@ -29,20 +41,21 @@ class CliLegacyTest(unittest.TestCase):
       self._runMain(['platforms'])
 
    def testHelpAll(self):
-      self._runMain(['--help-all'])
+      with self.assertRaises(SystemExit) as sysExit:
+         self._runMain(['--help-all'])
+      self.assertEqual(sysExit.exception.code, 0)
 
    def _foreachPlatform(self, *args, **kwargs):
       code = kwargs.get('code', 0)
       ignoreSup = kwargs.get('ignoreSupervisor', False)
       ignoreTup = tuple([Modular, Fabric] + ([Supervisor] if ignoreSup else []))
-      loadPlatforms()
-      for platform in getPlatforms():
+      for platform in self.platforms:
          if issubclass(platform, ignoreTup):
             continue
          if issubclass(platform, Linecard) and not platform.CPU_CLS:
             continue
          key = platform.SID[0] if platform.SID else platform.SKU[0]
-         _args = ['-p', key, '-s'] + list(args)
+         _args = ['-p', key] + list(args)
          self._runMain(_args, code)
 
    def testSetup(self):

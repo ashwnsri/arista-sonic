@@ -52,7 +52,15 @@ def setupSimulation():
    assert utils.inSimulation()
 
    logging.info('Running in simulation mode')
-   Config().lock_file = tempfile.mktemp(prefix='arista-', suffix='.lock')
+   fd, filename = tempfile.mkstemp(prefix='arista-', suffix='.lock')
+   Config().lock_file = filename
+   os.close(fd)
+
+def cleanupSimulation():
+   try:
+      os.remove(Config().lock_file)
+   except OSError as e:
+      logging.warning('Failed to remove lock file %s: %s', Config().lock_file, e)
 
 def addCommonArgs(parser):
    parser.add_argument('-v', '--verbosity', type=str,
@@ -128,5 +136,8 @@ def main(args):
    except ActionError as e:
       logging.error('%s', e)
       return e.code
+   finally:
+      if args.simulation:
+         cleanupSimulation()
 
    return 0
