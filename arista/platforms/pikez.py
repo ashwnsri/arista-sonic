@@ -38,6 +38,7 @@ class PikeZ(FixedSystem):
         (Rj45(i) for i in incrange(1, 48)),
         (Sfp(i) for i in incrange(49, 52)),
     )
+    AVS_SIC_HWAPI = 3
 
     def __init__(self):
         super().__init__()
@@ -138,7 +139,7 @@ class PikeZ(FixedSystem):
                 875: 0x0130, # 0.876V
             },
             (0x00FC, 0x00BE),
-        ) if self.getHwApi() >= HwApi(3) else ({
+        ) if self.getHwApi() >= HwApi(self.AVS_SIC_HWAPI) else ({
                 800: 0x019a, # 0.800V
                 825: 0x01a6, # 0.825V
                 850: 0x01b3, # 0.850V
@@ -205,6 +206,7 @@ class PikeZ2R(PikeZ):
 class PikeZMGX2F(PikeZ):
 
     CHASSIS = PikeZ2PMGXChassis
+    AVS_SIC_HWAPI = 1
 
     SID = ['PikeIslandZ-MGX-2F']
     SKU = ['CCS-720DT-48S-MGX-2F']
