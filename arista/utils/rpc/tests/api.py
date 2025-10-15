@@ -84,7 +84,7 @@ class ClientTest(unittest.IsolatedAsyncioTestCase):
             continue
          linecard = self._doCreateLinecard(sup, linecardCls)
          assert linecard
-         for f in [None, Priority.defaultFilter, Priority.backgroundFilter]:
+         for f in [None, Priority.defaultFilter, Priority.lateFilter]:
             linecard.setup(filters=f)
          return sup
       assert False, 'No linecard definitions available'

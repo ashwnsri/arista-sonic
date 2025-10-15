@@ -12,7 +12,7 @@ def setupFabric(fabric, args):
    if args.early or not args.late:
       fabric.setup(Priority.defaultFilter)
    if args.late or not args.early:
-      fabric.setup(Priority.backgroundFilter)
+      fabric.setup(Priority.lateFilter)
    if args.on:
       if fabric.poweredOn() and args.powerCycleIfOn:
          fabric.powerOnIs(False)
@@ -20,7 +20,7 @@ def setupFabric(fabric, args):
       if args.early or not args.late:
          fabric.setupMain(Priority.defaultFilter)
       if args.late or not args.early:
-         fabric.setupMain(Priority.backgroundFilter)
+         fabric.setupMain(Priority.lateFilter)
 
 @registerAction(setupParser)
 def doSetup(ctx, args):

@@ -15,7 +15,7 @@ def setupLinecard(linecard, args, lcpu):
    if args.early or not args.late:
       linecard.setupStandby(Priority.defaultFilter)
    if args.late or not args.early:
-      linecard.setupStandby(Priority.backgroundFilter)
+      linecard.setupStandby(Priority.lateFilter)
 
    if not args.on:
       return
@@ -39,13 +39,13 @@ def setupLinecard(linecard, args, lcpu):
       if args.early or not args.late:
          linecard.setupControlPlane(Priority.defaultFilter)
       if args.late or not args.early:
-         linecard.setupControlPlane(Priority.backgroundFilter)
+         linecard.setupControlPlane(Priority.lateFilter)
 
       if not lcpu:
          if args.early or not args.late:
             linecard.setupMain(Priority.defaultFilter)
          if args.late or not args.early:
-            linecard.setupMain(Priority.backgroundFilter)
+            linecard.setupMain(Priority.lateFilter)
 
          # Pull down the linecard reload causes from hardware DPM
          logging.info('%s: Process reload cause info', linecard)

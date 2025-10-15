@@ -39,7 +39,7 @@ class FabricTest(unittest.TestCase):
          self.logger.info('Testing setup for fabric %s', name)
          fabric = self.createFabric(fabricCls)
          assert fabric
-         for f in [None, Priority.defaultFilter, Priority.backgroundFilter]:
+         for f in [None, Priority.defaultFilter, Priority.lateFilter]:
             fabric.setup(filters=f)
          assert fabric
 

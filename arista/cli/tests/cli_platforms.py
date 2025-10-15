@@ -48,9 +48,6 @@ class CliLegacyTest(unittest.TestCase):
    def testSetup(self):
       self._foreachPlatform('setup')
 
-   def testSetupBackground(self):
-      self._foreachPlatform('setup', '--reset', '--background')
-
    def testResetToggle(self):
       self._foreachPlatform('reset', '--toggle')
 

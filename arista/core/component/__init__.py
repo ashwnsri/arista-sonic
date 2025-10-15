@@ -9,7 +9,7 @@ class Priority(object):
    DEFAULT = 0
    THERMAL = 0
    COOLING = 0
-   BACKGROUND = 1
+   LATE = 1
    DPM = 1
    POWER = 1
    LED = 1
@@ -18,7 +18,7 @@ class Priority(object):
       return staticmethod(lambda component: component.priority in priorities)
 
    defaultFilter = priorityFilter(DEFAULT)
-   backgroundFilter = priorityFilter(BACKGROUND)
+   lateFilter = priorityFilter(LATE)
 
 class Component(object):
 

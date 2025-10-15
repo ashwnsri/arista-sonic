@@ -1,8 +1,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-import os
-
 from . import registerAction
 from ..args.setup import setupParser
 from ...core import utils
@@ -17,17 +15,6 @@ def reportPlatformInfo(platform):
    keys = ['SKU', 'SID', 'SerialNumber']
    fields = ['%s=%s' % (k, v) for k, v in platform.getEeprom().items() if k in keys]
    logging.debug('Platform info: %s', ' '.join(fields))
-
-def forkForLateInitialization(platform):
-   try:
-      pid = os.fork()
-   except OSError:
-      logging.warning('fork failed, setting up background drivers normally')
-   else:
-      if pid > 0:
-         logging.debug('initializing slow drivers in child %d', pid)
-         platform.waitForIt()
-         os._exit(0) # pylint: disable=protected-access
 
 def setupXcvrs(platform):
    for xcvrSlot in platform.getInventory().getXcvrSlots().values():
@@ -67,14 +54,7 @@ def doSetup(ctx, args):
          setupXcvrs(platform)
 
       if args.late or not args.early:
-         if args.background:
-            logging.debug('forking and setting up slow drivers in background')
-            forkForLateInitialization(platform)
-         else:
-            logging.debug('setting up slow drivers normally')
-
-         platform.setup(Priority.backgroundFilter)
+         platform.setup(Priority.lateFilter)
 
       if args.early or not args.late:
-         if not args.background:
-            platform.waitForIt()
+         platform.waitForIt()

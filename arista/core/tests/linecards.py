@@ -41,7 +41,7 @@ class LinecardTest(unittest.TestCase):
          self.logger.info('Testing setup for linecard %s', name)
          linecard = self.createLinecard(linecardCls)
          assert linecard
-         for f in [None, Priority.defaultFilter, Priority.backgroundFilter]:
+         for f in [None, Priority.defaultFilter, Priority.lateFilter]:
             linecard.setup(filters=f)
          assert linecard
 
