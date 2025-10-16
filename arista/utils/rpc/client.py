@@ -53,8 +53,11 @@ class RpcClient():
             # could trigger an event later that we wouldn't be able to block waiting
             # for.
             self.poller.register(self.sock.fileno(), EPOLLIN|EPOLLERR|EPOLLHUP)
+            return
          except OSError:
             time.sleep(delay)
+
+      raise RpcClientException('Could not connect to RPC API server')
 
 
    def _clearSocket(self):
