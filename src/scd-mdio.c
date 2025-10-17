@@ -208,7 +208,7 @@ static int scd_mdio_read(struct net_device *netdev, int prtad, int devad, u16 ad
    int mii_id = scd_mdio_mii_id(prtad, devad, mdio_dev->mode_support);
    int i;
 
-   for (i = 0; i < MAX_DEVICES_PER_BUS; i++) {
+   for (i = 0; i < PHY_MAX_ADDR; i++) {
       if (mdio_dev->mdio_bus->dev_id_to_addr[i] == mii_id) {
          dev_id = i;
          break;
@@ -230,7 +230,7 @@ static int scd_mdio_write(struct net_device *netdev, int prtad, int devad, u16 a
    int mii_id = scd_mdio_mii_id(prtad, devad, mdio_dev->mode_support);
    int i;
 
-   for (i = 0; i < MAX_DEVICES_PER_BUS; i++) {
+   for (i = 0; i < PHY_MAX_ADDR; i++) {
       if (mdio_dev->mdio_bus->dev_id_to_addr[i] == mii_id) {
          dev_id = i;
          break;
