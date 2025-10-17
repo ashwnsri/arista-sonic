@@ -14,6 +14,7 @@ from ..components.dpm.adm1266 import (
    AdmGpio
 )
 from ..components.lm75 import Tmp75
+from ..components.max31732 import Max31732
 from ..components.phy.screamingeagle import ScreamingEagle
 
 from ..descs.gpio import GpioDesc
@@ -78,6 +79,19 @@ class CitrineBase(FixedSystem):
       scd.newComponent(Tmp75, addr=scd.i2cAddr(0, 0x48), sensors=[
             SensorDesc(diode=0, name='Management Card', position=Position.INLET,
                        target=95, overheat=100, critical=105),
+      ])
+
+      scd.newComponent(Max31732, addr=scd.i2cAddr(0, 0x1c), sensors=[
+            SensorDesc(diode=0, name='PCB Temp Near Q3D', position=Position.OTHER,
+                       target=94, overheat=100, critical=105),
+            SensorDesc(diode=1, name='D0 Temp diode 0', position=Position.OTHER,
+                       target=94, overheat=100, critical=105),
+            SensorDesc(diode=2, name='D0 Temp diode 1', position=Position.OTHER,
+                       target=94, overheat=100, critical=105),
+            SensorDesc(diode=3, name='D1 Temp diode 0', position=Position.OTHER,
+                       target=94, overheat=100, critical=105),
+            SensorDesc(diode=4, name='D1 Temp diode 1', position=Position.OTHER,
+                       target=94, overheat=100, critical=105),
       ])
 
       scd.addLeds([
