@@ -34,6 +34,7 @@
 #include "scd-mdio.h"
 #include "scd-reset.h"
 #include "scd-smbus.h"
+#include "scd-spi.h"
 #include "scd-xcvr.h"
 #include "scd-uart.h"
 
@@ -416,6 +417,58 @@ static ssize_t parse_new_object_uart(struct scd_context *ctx,
    return count;
 }
 
+static ssize_t parse_new_object_spi_controller(struct scd_context *ctx,
+                                               char *buf, size_t count)
+{
+   u32 addr;
+   u32 stride;
+   s16 bus;
+   u16 num_chipselect;
+   int res;
+
+   const char *tmp;
+
+   if (!buf)
+      return -EINVAL;
+
+   PARSE_ADDR_OR_RETURN(&buf, tmp, u32, &addr, ctx->res_size);
+   PARSE_ADDR_OR_RETURN(&buf, tmp, u32, &stride, ctx->res_size);
+   PARSE_INT_OR_RETURN(&buf, tmp, s16, &bus);
+   PARSE_INT_OR_RETURN(&buf, tmp, u16, &num_chipselect);
+   PARSE_END_OR_RETURN(&buf, tmp);
+
+   res = scd_spi_controller_add(ctx, addr, stride, bus, num_chipselect);
+   if (res)
+      return res;
+
+   return count;
+}
+
+static ssize_t parse_new_object_spi_device(struct scd_context *ctx, 
+                                           char *buf, size_t count)
+{
+   s16 bus;
+   u16 chip_select;
+   const char *modalias;
+   int res;
+
+   const char *tmp;
+
+   if (!buf)
+      return -EINVAL;
+
+   PARSE_INT_OR_RETURN(&buf, tmp, s16, &bus);
+   PARSE_INT_OR_RETURN(&buf, tmp, u16, &chip_select);
+   PARSE_STR_OR_RETURN(&buf, tmp, modalias);
+   PARSE_END_OR_RETURN(&buf, tmp);
+
+   res = scd_spi_device_add(ctx, bus, chip_select, modalias);
+   if (res)
+      return res;
+
+   return count;
+}
+
 typedef ssize_t (*new_object_parse_func)(struct scd_context*, char*, size_t);
 static struct {
    const char *name;
@@ -431,6 +484,8 @@ static struct {
    { "reset",           parse_new_object_reset },
    { "sfp",             parse_new_object_sfp },
    { "smbus_master",    parse_new_object_smbus_master },
+   { "spi_controller",  parse_new_object_spi_controller },
+   { "spi_device",      parse_new_object_spi_device },
    { "uart",            parse_new_object_uart },
    { NULL, NULL }
 };
@@ -671,6 +726,7 @@ static int scd_ext_hwmon_probe(struct pci_dev *pdev, size_t mem_len)
    INIT_LIST_HEAD(&ctx->led_list);
    INIT_LIST_HEAD(&ctx->smbus_master_list);
    INIT_LIST_HEAD(&ctx->mdio_master_list);
+   INIT_LIST_HEAD(&ctx->spi_controller_list);
    INIT_LIST_HEAD(&ctx->gpio_list);
    INIT_LIST_HEAD(&ctx->reset_list);
    INIT_LIST_HEAD(&ctx->xcvr_list);
@@ -720,6 +776,7 @@ static void scd_ext_hwmon_remove(struct pci_dev *pdev)
    scd_xcvr_remove_all(ctx);
    scd_fan_group_remove_all(ctx);
    scd_uart_remove_all(ctx);
+   scd_spi_controller_remove_all(ctx);
    scd_unlock(ctx);
 
    module_lock();

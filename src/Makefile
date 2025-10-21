@@ -14,6 +14,7 @@ scd-hwmon-objs += scd-main.o
 scd-hwmon-objs += scd-mdio.o
 scd-hwmon-objs += scd-reset.o
 scd-hwmon-objs += scd-smbus.o
+scd-hwmon-objs += scd-spi.o
 scd-hwmon-objs += scd-uart.o
 scd-hwmon-objs += scd-xcvr.o
 # Add module src path as include dir for tracepoints

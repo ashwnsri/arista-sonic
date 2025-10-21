@@ -41,6 +41,7 @@ struct scd_context {
    struct list_head reset_list;
    struct list_head led_list;
    struct list_head smbus_master_list;
+   struct list_head spi_controller_list;
    struct list_head mdio_master_list;
    struct list_head xcvr_list;
    struct list_head fan_group_list;
