@@ -33,6 +33,7 @@ class CitrineBase(FixedSystem):
    def __init__(self):
       super(CitrineBase, self).__init__()
       self.cpu = self.newComponent(RedstartCpu)
+      self.syscpld = self.cpu.syscpld
       gpioMask = 0b000001111
       self.cpu.cpld.newComponent(Adm1266,
                 addr=self.cpu.getSmbus(self.cpu.SMBUS_POL).i2cAddr(0x40),
