@@ -113,8 +113,6 @@ class CitrineBase(FixedSystem):
             slotId=psuId,
             addrFunc=addrFunc,
             presentGpio=scd.inventory.getGpio("%s_present" % name),
-            inputOkGpio=scd.inventory.getGpio("%s_ac_status" % name),
-            outputOkGpio=scd.inventory.getGpio("%s_status" % name),
             psus=[],
          )
 
