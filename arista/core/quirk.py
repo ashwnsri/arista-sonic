@@ -1,4 +1,5 @@
 
+import os
 import subprocess
 
 from .log import getLogger
@@ -40,6 +41,21 @@ class PciConfigQuirk(QuirkCmd): # TODO: reparent when using PciTopology
       super().__init__(['setpci', '-s', str(addr), expr], description)
       self.addr = addr
       self.expr = expr
+
+class SysfsQuirk(QuirkDesc):
+   def __init__(self, entry, value, description=None):
+      description = description or f'{entry} <- {value}'
+      super().__init__(description)
+      self.entry = entry
+      self.value = value
+
+   def run(self, component):
+      if inSimulation():
+         return
+
+      path = os.path.join(component.addr.getSysfsPath(), self.entry)
+      with open(path, "w", encoding='utf8') as f:
+         f.write(f'{self.value}')
 
 class RegMapSetQuirk(Quirk):
    DELAYED = True
