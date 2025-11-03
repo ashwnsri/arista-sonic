@@ -38,14 +38,6 @@ class PuffinPrimeCpu(Cpu):
 
       cpld.createInterrupt(addr=0x3000, num=0)
 
-      cpld.addLeds([
-         (0x4000, 'beacon'),
-         (0x4010, 'status'),
-         (0x4020, 'fan_status'),
-         (0x4030, 'psu1'),
-         (0x4040, 'psu2'),
-      ])
-
       cpld.createPowerCycle()
       cpld.addSmbusMasterRange(0x8000, 1, 0x80, 4)
 

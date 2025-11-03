@@ -235,6 +235,14 @@ class LodogaPrime(LodogaBase):
       super().__init__(PuffinPrimeCpu, LodogaPrimeCpldRegisters)
 
    def addPlatformComponents(self):
+      self.cpu.cpld.addLeds([
+         (0x4000, 'beacon'),
+         (0x4010, 'status'),
+         (0x4020, 'fan_status'),
+         (0x4030, 'psu1'),
+         (0x4040, 'psu2'),
+      ])
+
       self.syscpld.addReloadCauseProvider(causes=[
          SysCpldCause(0x00, SysCpldCause.UNKNOWN),
          SysCpldCause(0x01, SysCpldCause.OVERTEMP),
