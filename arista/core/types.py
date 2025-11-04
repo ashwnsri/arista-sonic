@@ -94,3 +94,9 @@ class MdioSpeed(enum.IntEnum):
    S2_5 = 1
    S5 = 2
    S10 = 3
+
+class MdioSpeedV2(enum.IntEnum):
+   S15 = 0
+   S10 = 1
+   S5 = 2
+   S7_5 = 3

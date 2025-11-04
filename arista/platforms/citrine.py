@@ -1,9 +1,10 @@
 from ..core.fixed import FixedSystem
+from ..core.hwapi import HwApi
 from ..core.platform import registerPlatform
 from ..core.port import PortLayout
-from ..core.types import MdioSpeed
-from ..core.utils import incrange
 from ..core.psu import PsuSlot
+from ..core.types import MdioSpeedV2
+from ..core.utils import incrange
 
 from ..components.scd import Scd
 from ..components.asic.dnx.jericho3 import Jericho3
@@ -53,7 +54,8 @@ class CitrineBase(FixedSystem):
       scd = port.newComponent(Scd, addr=port.addr)
       self.scd = scd
 
-      self.scd.addMdioMasterRange(0x9000, 16, speed=MdioSpeed.S5)
+      mdioSpeed = MdioSpeedV2.S5 if self.getHwApi() < HwApi(2) else MdioSpeedV2.S7_5
+      self.scd.addMdioMasterRange(0x9000, 16, speed=mdioSpeed)
       for i in range(16):
          phyId = i + 1
          self.inventory.addPhy(ScreamingEagle(
