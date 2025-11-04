@@ -8,8 +8,9 @@ def getKernelI2cBuses(force=False):
       return _i2cBuses
    _i2cBuses.clear()
    buses = {}
-   root = '/sys/class/i2c-adapter'
-   for busName in sorted(os.listdir(root), key=lambda x: int(x[4:])):
+   root = '/sys/bus/i2c/devices'
+   sysfsBuses = [x for x in os.listdir(root) if x.startswith('i2c-')]
+   for busName in sorted(sysfsBuses, key=lambda x: int(x[4:])):
       busId = int(busName.replace('i2c-', ''))
       with open(os.path.join(root, busName, 'name')) as f:
          buses[busId] = f.read().rstrip()

@@ -4,7 +4,7 @@ from arista.core.config import Config
 from arista.utils.sonic_platform.thermal import SfpThermal
 from sonic_platform_base.sonic_xcvr.sfp_optoe_base import SfpOptoeBase
 
-EEPROM_PATH = '/sys/class/i2c-adapter/i2c-{0}/{0}-{1:04x}/eeprom'
+EEPROM_PATH = '/sys/bus/i2c/devices/i2c-{0}/{0}-{1:04x}/eeprom'
 
 # XXX: Temporary class while sfp refactor is in progress. Once refactor is done
 # this class should replace the existing Sfp class.

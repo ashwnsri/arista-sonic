@@ -18,7 +18,7 @@ try:
 except ImportError as e:
    SfpOptoe = None
 
-EEPROM_PATH = '/sys/class/i2c-adapter/i2c-{0}/{0}-{1:04x}/eeprom'
+EEPROM_PATH = '/sys/bus/i2c/devices/i2c-{0}/{0}-{1:04x}/eeprom'
 
 # XXX Remove these constants after refactor
 SFP_TYPE = 'SFP'

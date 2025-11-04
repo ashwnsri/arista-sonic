@@ -28,7 +28,7 @@
 #define ADAPTER_NAME_SZ 64
 #define BUS_INVALID ((uint32_t)-1)
 #define NUM_BUS_MAX 256
-#define ADAPTER_PATH "/sys/class/i2c-adapter"
+#define ADAPTER_PATH "/sys/bus/i2c/devices"
 
 struct xcvr_info {
    uint16_t id;

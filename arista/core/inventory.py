@@ -143,7 +143,7 @@ class Inventory():
       return self.osfpSlots
 
    def getPortToEepromMapping(self):
-      eepromPath = '/sys/class/i2c-adapter/i2c-{0}/{0}-{1:04x}/eeprom'
+      eepromPath = '/sys/bus/i2c/devices/i2c-{0}/{0}-{1:04x}/eeprom'
       return {xcvrId : eepromPath.format(
                        xcvr.getI2cAddr().bus, xcvr.getI2cAddr().address)
               for xcvrId, xcvr in self.getXcvrs().items()}
