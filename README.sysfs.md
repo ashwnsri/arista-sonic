@@ -32,8 +32,12 @@ Examples shown may differ across platforms but the logic stays the same.
 
 ### LEDs
 
-LED objects can be found under `/sys/class/leds`.The brightness field is used to
-toggle between off and different colors.
+LED objects can be found under `/sys/class/leds` and generally respect the
+[sysfs-interface](https://www.kernel.org/doc/Documentation/hwmon-sysfs-interface)
+for LEDs. On some platforms, however, the brightness field is overloaded to
+toggle between off and different colors, rather than using multicolor LED
+support.
+
 The brightness to LED color mapping is as follows (0 maps to off for all LEDs):
 
 ```

@@ -4,12 +4,20 @@ class Xcvr(HwDesc):
    LANES = None
    SPEED = None
 
-   def __init__(self, index, speed=None, lanes=None, leds=1, **kwargs):
+   def __init__(self, index, speed=None, lanes=None, leds=1, defaultLed=None,
+                **kwargs):
       super(Xcvr, self).__init__(**kwargs)
       self.index = index
-      self.leds = leds
       self.lanes = lanes or self.LANES
       self.speed = speed or self.SPEED
+      self.defaultLed = defaultLed
+
+      if isinstance(leds, int):
+         self.leds = leds
+         self.ledDescs = []
+      else:
+         self.leds = len(leds)
+         self.ledDescs = leds
 
    def __str__(self):
       return f'{self.__class__.__name__}(index={self.index})'

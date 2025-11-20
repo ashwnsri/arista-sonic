@@ -97,6 +97,9 @@ class EthernetSlotImpl(EthernetSlotInv):
    def getLeds(self):
       return self.slot.leds
 
+   def getDefaultLed(self):
+      return self.slot.defaultLed
+
    def getInterruptLine(self):
       # Not supported for Ethernet
       return None
@@ -156,6 +159,9 @@ class SfpSlotImpl(SfpSlotInv):
    def getLeds(self):
       return self.slot.leds
 
+   def getDefaultLed(self):
+      return self.slot.defaultLed
+
    def getInterruptLine(self):
       return self.slot.getInterruptLine()
 
@@ -210,6 +216,9 @@ class QsfpSlotImpl(QsfpSlotInv):
    def getLeds(self):
       return self.slot.leds
 
+   def getDefaultLed(self):
+      return self.slot.defaultLed
+
    def getInterruptLine(self):
       return self.slot.getInterruptLine()
 
@@ -263,6 +272,9 @@ class OsfpSlotImpl(OsfpSlotInv):
    def getLeds(self):
       return self.slot.leds
 
+   def getDefaultLed(self):
+      return self.slot.defaultLed
+
    def getInterruptLine(self):
       return self.slot.getInterruptLine()
 
@@ -302,7 +314,7 @@ class OsfpSlotImpl(OsfpSlotInv):
 
 class XcvrSlot(SlotComponent):
    def __init__(self, slotId=None, name=None, addrFunc=None, interrupt=None,
-                presentGpio=None, leds=None, **kwargs):
+                presentGpio=None, leds=None, defaultLed=None, **kwargs):
       super().__init__(**kwargs)
       self.addrFunc = addrFunc
       self.slotId = slotId
@@ -310,6 +322,7 @@ class XcvrSlot(SlotComponent):
       self.interrupt = interrupt
       self.presentGpio = presentGpio
       self.leds = leds
+      self.defaultLed = defaultLed
       self.xcvrInv = None
       self.xcvr = None
 
@@ -332,6 +345,9 @@ class XcvrSlot(SlotComponent):
 
    def getLeds(self):
       return self.leds
+
+   def getDefaultLed(self):
+      return self.defaultLed
 
 class EthernetSlot(XcvrSlot):
    def __init__(self, **kwargs):

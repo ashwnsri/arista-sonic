@@ -17,7 +17,7 @@ from ....libs.retry import tryGet
 from .sysfs import (
    FanSysfsImpl,
    GpioSysfsImpl,
-   LedSysfsImpl,
+   LedLegacySysfsImpl,
    RailSysfsImpl,
    ResetSysfsImpl,
    TempSysfsImpl,
@@ -95,10 +95,10 @@ class KernelDriver(Driver):
       return FanSysfsImpl(self, desc, **kwargs)
 
    def getFanLed(self, desc, **kwargs):
-      return LedSysfsImpl(self, desc, **kwargs)
+      return LedLegacySysfsImpl(self, desc, **kwargs)
 
    def getLed(self, desc, **kwargs):
-      return LedSysfsImpl(self, desc, **kwargs)
+      return LedLegacySysfsImpl(self, desc, **kwargs)
 
    def getTempSensor(self, desc, **kwargs):
       return TempSysfsImpl(self, desc, **kwargs)

@@ -1,5 +1,6 @@
 from __future__ import print_function, with_statement
 
+import copy
 import os
 
 from collections import OrderedDict, namedtuple
@@ -208,6 +209,8 @@ class Scd(PciComponent):
       self.mmapReady = False
       self.interrupts = []
       self.fanGroups = []
+      self.ledFlashCtrlAddr = None
+      self.ledPaletteAddr = None
       self.leds = []
       self.gpios = []
       self.powerCycles = []
@@ -303,19 +306,31 @@ class Scd(PciComponent):
    def addFanGroup(self, addr, platform, slots, count):
       self.fanGroups += [(addr, platform, slots, count)]
 
-   def _addLed(self, addr, name, **kwargs):
-      desc = LedDesc(name=name)
-      self.leds += [(addr, name)]
+   def _addLedNoInv(self, addr, name, **kwargs):
+      desc = LedDesc(name=name, addr=addr)
+      self.leds += [desc]
       return self.driver.getLed(desc, **kwargs)
 
-   def addLed(self, addr, name, **kwargs):
-      return self.inventory.addLed(self._addLed(addr, name, **kwargs))
+   def _addLedInv(self, addr, name, **kwargs):
+      return self.inventory.addLed(self._addLedNoInv(addr, name, **kwargs))
+
+   def _addLedDescNoInv(self, desc, **kwargs):
+      self.leds += [desc]
+      return self.driver.getLed(desc, **kwargs)
+
+   def _addLedDesc(self, desc, **kwargs):
+      return self.inventory.addLed(self._addLedDescNoInv(desc, **kwargs))
 
    def addLeds(self, leds, **kwargs):
-      return [self.addLed(*led, **kwargs) for led in leds]
+      if len(leds) >=1 and isinstance(leds[0], LedDesc):
+         return [self._addLedDesc(led, **kwargs) for led in leds]
+      return [self._addLedInv(*led, **kwargs) for led in leds]
 
    def addLedGroup(self, groupName, leds):
-      leds = [self._addLed(*led) for led in leds]
+      if len(leds) >=1  and isinstance(leds[0], LedDesc):
+         leds = [self._addLedDescNoInv(led) for led in leds]
+      else:
+         leds = [self._addLedNoInv(*led) for led in leds]
       self.inventory.addLedGroup(groupName, leds)
       return leds
 
@@ -359,12 +374,29 @@ class Scd(PciComponent):
                                 activeLow=True)
          presentGpio = self.addXcvrGpio(presentDesc)
       leds = []
-      for laneId in incrange(1, port.leds):
-         laneName = name
-         if port.leds > 1:
-            laneName = "%s_%d" % (laneName, laneId)
-         leds.append((ledAddr, laneName))
-         ledAddr += ledAddrOffsetFn(port.index)
+      if len(port.ledDescs) > 0:
+         if port.defaultLed is not None:
+            defaultLed = port.defaultLed % name \
+               if '%' in port.defaultLed else port.defaultLed
+         else:
+            defaultLed = leds[0].name
+
+         for desc in port.ledDescs:
+            desc = copy.deepcopy(desc)
+            ledName = desc.name % name if '%' in desc.name else desc.name
+            desc.name = ledName
+            desc.addr += ledAddr
+            leds += [desc]
+
+         port.defaultLed = defaultLed
+      else:
+         defaultLed = None
+         for laneId in incrange(1, port.leds):
+            laneName = name
+            if port.leds > 1:
+               laneName = "%s_%d" % (laneName, laneId)
+            leds.append((ledAddr, laneName))
+            ledAddr += ledAddrOffsetFn(port.index)
       ledGroup = self.addLedGroup(name, leds)
       return self.newComponent(
          cls=cls,
@@ -374,6 +406,7 @@ class Scd(PciComponent):
          interrupt=intr,
          presentGpio=presentGpio,
          leds=ledGroup,
+         defaultLed=defaultLed,
          **kwargs
       )
 
@@ -487,7 +520,7 @@ class Scd(PciComponent):
       return self.newComponent(
          FanSlot,
          slotId=slotId,
-         led=self.addLed(*statusLed) if statusLed else self.addFanLed(led),
+         led=self._addLedInv(*statusLed) if statusLed else self.addFanLed(led),
          fans=[self.addFan(desc) for desc in fanDescs]
       )
 

@@ -167,6 +167,39 @@ class SysfsEntryCustomLed(SysfsEntryIntLed):
    def _writeConversion(self, value):
       return str(self.color2value[value])
 
+class SysfsEntryLedMaxBrightness(SysfsEntryInt):
+   def __init__(self, parent, name, **kwargs):
+      def getPath(n):
+         ledsPath = os.path.join(parent.driver.getSysfsPath(), 'leds')
+         return os.path.join(ledsPath, n, 'max_brightness')
+      super().__init__(parent, name, pathCallback=getPath, **kwargs)
+
+class SysfsEntryLedMultiIndex(SysfsEntry):
+   def __init__(self, parent, name, **kwargs):
+      def getPath(n):
+         ledsPath = os.path.join(parent.driver.getSysfsPath(), 'leds')
+         return os.path.join(ledsPath, n, 'multi_index')
+      super().__init__(parent, name, pathCallback=getPath, **kwargs)
+
+   def _readConversion(self, value: str) -> list[str]:
+      return value.split()
+
+   def _writeConversion(self, value: list[str]) -> str:
+      return ' '.join(value)
+
+class SysfsEntryLedMultiIntensity(SysfsEntry):
+   def __init__(self, parent, name, **kwargs):
+      def getPath(n):
+         ledsPath = os.path.join(parent.driver.getSysfsPath(), 'leds')
+         return os.path.join(ledsPath, n, 'multi_intensity')
+      super().__init__(parent, name, pathCallback=getPath, **kwargs)
+
+   def _readConversion(self, value: str) -> list[int]:
+      return [int(v) for v in value.split()]
+
+   def _writeConversion(self, value: list[int]) -> str:
+      return ' '.join([str(v) for v in value])
+
 class GenericSysfs(object):
 
    DESC_CLS = None
@@ -342,7 +375,7 @@ class FanSysfsImpl(Fan, GenericSysfs):
    def getLed(self):
       return self.led
 
-class LedSysfsImpl(Led):
+class LedLegacySysfsImpl(Led):
    def __init__(self, driver, desc, **kwargs):
       self.driver = driver
       self.desc = desc
@@ -360,6 +393,132 @@ class LedSysfsImpl(Led):
 
    def isStatusLed(self):
       return 'sfp' in self.desc.name
+
+class LedMonoSysfsImpl(Led):
+   def __init__(self, driver, desc, **kwargs):
+      self.driver = driver
+      self.desc = desc
+      self.brightness = SysfsEntryIntLed(self, desc.name)
+      self.maxBrightness = SysfsEntryLedMaxBrightness(self, desc.name)
+      self.__dict__.update(kwargs)
+
+      assert len(desc.colors) == 1
+      self.color = self.desc.colors[0]
+
+   def getName(self) -> str:
+      return self.desc.name
+
+   def getColor(self) -> str:
+      return self.color if self.brightness.read() > 0 else LedColor.OFF
+
+   def setColor(self, color: str) -> None:
+      if color == LedColor.OFF:
+         self.brightness.write(0)
+         return
+
+      if color != self.color:
+         logging.warning('unsupported color "%s" for led %s' % (color,
+                                                                self.getName()))
+         color = self.color
+
+      self.brightness.write(self.maxBrightness.read())
+
+   def isStatusLed(self) -> bool:
+      return 'sfp' in self.desc.name
+
+class LedMultiColorSysfsImpl(Led):
+   COLOR_MIXES = {
+      LedColor.AMBER: [[LedColor.RED, LedColor.GREEN]]
+   }
+
+   def __init__(self, driver, desc, **kwargs):
+      self.driver = driver
+      self.desc = desc
+      self.brightness = SysfsEntryIntLed(self, desc.name)
+      self.maxBrightness = SysfsEntryLedMaxBrightness(self, desc.name)
+      self.multiIndex = SysfsEntryLedMultiIndex(self, desc.name)
+      self.multiIntensity = SysfsEntryLedMultiIntensity(self, desc.name)
+      self.index_ = None
+      self.__dict__.update(kwargs)
+
+      assert len(desc.colors) > 1
+
+   @property
+   def index(self) -> list[str]:
+      if self.index_ is None:
+         self.index_ = self.multiIndex.read()
+
+      return self.index_
+
+   def getName(self):
+      return self.desc.name
+
+   def getColor(self) -> str:
+      if self.brightness.read() <= 0:
+         return LedColor.OFF
+
+      components = self._parseColor(self.multiIntensity.read())
+      nonzero = [c for c, i in components.items() if i > 0]
+
+      if len(nonzero) == 1:
+         return nonzero[0]
+
+      for color, mixes in self.COLOR_MIXES.items():
+         for primaries in mixes:
+            if set(primaries) == set(nonzero):
+               return color
+
+      return LedColor.OTHER
+
+   def setColor(self, color: str) -> None:
+      if color == LedColor.OFF:
+         self.brightness.write(0)
+         return
+
+      fullIntensity = self.maxBrightness.read()
+      intensity = self._makeColor({})
+
+      if color in self.index:
+         # Simple case: color exists as one of the LED colors.
+         intensity = self._makeColor({color: fullIntensity})
+      elif color in self.COLOR_MIXES:
+         # Else, try a mix.
+         for mix in self.COLOR_MIXES[color]:
+            # Check whether all mix primaries are available.
+            if not set(mix).issubset(self.index):
+               continue
+
+            intensity = self._makeColor({c : fullIntensity for c in mix})
+            break
+
+         self._unsupportedColor(color)
+      else:
+         self._unsupportedColor(color)
+
+
+      self.multiIntensity.write(intensity)
+      self.brightness.write(fullIntensity)
+
+   def isStatusLed(self):
+      return 'sfp' in self.desc.name
+
+   def _makeColor(self, components: dict[str, int]) -> list[int]:
+      color = []
+      for name in self.index:
+         value = components[name] if name in components.keys() else 0
+         color.append(value)
+
+      return color
+
+   def _parseColor(self, color: list[int]) -> dict[str, int]:
+      components = {}
+      for idx, value in enumerate(color):
+         components[self.index[idx]] = value
+
+      return components
+
+   def _unsupportedColor(self, color: str) -> None:
+      logging.warning('unsupported color "%s" for led %s' % (color, self.getName()))
 
 class LedRgbSysfsImpl(Led):
    def __init__(self, driver, desc, prefix, **kwargs):

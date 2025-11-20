@@ -17,7 +17,7 @@ from ..components.psu.dcdc import MobyDcDc, MobyDcDcAddr18
 from ..components.scd import Scd, ScdCause, ScdReloadCauseRegisters
 from ..components.xcvr import CmisEeprom
 
-# from ..descs.led import LedColor, LedDesc
+from ..descs.led import LedDesc, LedKind
 from ..descs.gpio import GpioDesc
 from ..descs.psu import PsuStatusPolicy
 from ..descs.reset import ResetDesc
@@ -25,6 +25,13 @@ from ..descs.sensor import Position, SensorDesc
 from ..descs.xcvr import Osfp800, Qsfp28, Xcvr as XcvrDesc
 
 from .cpu.redstart import RedstartCpu
+
+
+SFP_TRICOLOR_LED = {'defaultLed': '%s:rgb:1', 'leds': [
+   LedDesc(addr=0, name='%s:ga', **LedKind.desc(LedKind.GA_F)),
+   LedDesc(addr=4, name='%s:rgb:1', **LedKind.desc(LedKind.RGB_P3F)),
+   LedDesc(addr=8, name='%s:rgb:2', **LedKind.desc(LedKind.RGB_P3F)),
+]}
 
 class Cartridge:
    def __init__(self, index, eeprom, interrupt, wp):
@@ -76,15 +83,14 @@ class Moby(FixedSystem):
    CHASSIS = MobyChassis
    CPU_CLS = RedstartCpu
    COOLING = CoolingConfig(minSpeed=15)
-   LED_FP_TRICOLOR = True
 
    BACKPLANE_CONNECTORS = 8
    BACKPLANE_CARTRIDGES = 4
 
    PORTS = PortLayout(
-      (Osfp800(i) for i in incrange(1, 16)),
+      (Osfp800(i, **SFP_TRICOLOR_LED) for i in incrange(1, 16)),
       (PaladinHd(i) for i in range(17, 17 + BACKPLANE_CONNECTORS)),
-      (Qsfp28(25),),
+      (Qsfp28(25, **SFP_TRICOLOR_LED),),
    )
 
    SID = ['Moby', 'RedstartFixed8CNMoby']
@@ -124,13 +130,25 @@ class Moby(FixedSystem):
                     position=Position.OTHER, target=105, overheat=115, critical=125),
       ])
 
+      scd.ledFlashCtrlAddr = 0x6000
+
       scd.addLeds([
-         (0x6010 + 0x4 * i, f'blade{i+1}') for i in range(0, 12)
+         LedDesc(
+            name=f'blade{i+1}',
+            addr=0x6010 + 0x4 * i,
+            **LedKind.desc(LedKind.RGB_8_F),
+         ) for i in range(0, 12)
       ])
       scd.addLeds([
-         (0x6050, 'status'),
-         (0x6060, 'fan_status'),
-         (0x6070, 'psu_status'),
+         LedDesc(
+            name=name,
+            addr=addr,
+            **LedKind.desc(LedKind.RGB_8_F),
+         ) for name, addr in [
+            ('status', 0x6050),
+            ('fan_status', 0x6060),
+            ('psu_status', 0x6070),
+         ]
       ])
 
       intrs = [
@@ -179,6 +197,9 @@ class Moby(FixedSystem):
       port = self.cpu.getPciPort(self.cpu.PCI_PORT_SCD1)
       pscd = port.newComponent(Scd, addr=port.addr)
       self.pscd = pscd
+
+      pscd.ledFlashCtrlAddr = 0x6000
+      pscd.ledPaletteAddr = 0x6f00
 
       pscd.addSmbusMasterRange(0x8000, 18, 0x80, 1)
 

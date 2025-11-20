@@ -9,11 +9,15 @@ from ...core.driver.kernel.pci import PciKernelDriver
 from ...core.driver.kernel.sysfs import (
    FanSysfsImpl,
    GpioSysfsImpl,
-   LedSysfsImpl,
+   LedLegacySysfsImpl,
+   LedMonoSysfsImpl,
+   LedMultiColorSysfsImpl,
    ResetSysfsImpl,
 )
 
 from ...core.driver.user.i2c import I2cDevDriver
+
+from ...descs.led import LedKind
 
 from ...libs.i2c import i2cBusFromName
 
@@ -95,8 +99,14 @@ class ScdKernelDriver(PciKernelDriver):
       for addr, platform, slots, count in scd.fanGroups:
          data += ["fan_group %#x %u %u %u" % (addr, platform, slots, count)]
 
-      for addr, name in scd.leds:
-         data += ["led %#x %s" % (addr, name)]
+      if scd.ledFlashCtrlAddr is not None or scd.ledPaletteAddr is not None:
+         flashAddr = scd.ledFlashCtrlAddr or 0
+         paletteAddr = scd.ledPaletteAddr or 0
+         data += ["led_ctrl %#x %#x" % (flashAddr, paletteAddr)]
+
+      for desc in scd.leds:
+         kind = getattr(desc, 'kind', LedKind.LEGACY)
+         data += ["led %#x %s %s" % (desc.addr, desc.name, kind)]
 
       for addr, xcvrId in scd.osfps:
          data += ["osfp %#x %u" % (addr, xcvrId)]
@@ -168,7 +178,7 @@ class ScdKernelDriver(PciKernelDriver):
       return FanSysfsImpl(self, desc)
 
    def getFanLed(self, desc):
-      return LedSysfsImpl(self, desc)
+      return self._getLed(desc)
 
    def getReset(self, desc, **kwargs):
       return ResetSysfsImpl(self, desc, **kwargs)
@@ -177,7 +187,15 @@ class ScdKernelDriver(PciKernelDriver):
       return GpioSysfsImpl(self, desc, hwActiveLow=True, **kwargs)
 
    def getLed(self, desc, **kwargs):
-      return LedSysfsImpl(self, desc, **kwargs)
+      return self._getLed(desc, **kwargs)
+
+   def _getLed(self, desc):
+      kind = getattr(desc, 'kind', LedKind.LEGACY)
+      if kind == LedKind.LEGACY:
+         return LedLegacySysfsImpl(self, desc)
+      if kind == LedKind.BLUE:
+         return LedMonoSysfsImpl(self, desc)
+      return LedMultiColorSysfsImpl(self, desc)
 
 class ScdI2cDevDriver(I2cDevDriver):
    def __init__(self, **kwargs):

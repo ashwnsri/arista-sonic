@@ -1,6 +1,8 @@
 from collections import defaultdict
 import re
 
+from ..descs.led import LedColor
+
 from .sonic_utils import getInventory, parsePortConfig, getPlatform
 
 try:
@@ -62,6 +64,27 @@ class LedControlSysfs(LedControlCommon):
          self._setIntfColor(self.portMapping.get("Ethernet0"), 0, self.LED_PMW_SET)
 
    def _setIntfColor(self, port, idx, color):
+      xcvrSlot = self.inventory.getXcvrSlots()[port.portNum]
+      leds = xcvrSlot.getLeds()
+      defaultLed = xcvrSlot.getDefaultLed()
+
+      if defaultLed is None:
+         self._setIntfColorLegacy(port, idx, color)
+         return
+
+      led = None
+      for led in leds:
+         if led.desc.name == defaultLed:
+            break
+
+      if color == self.LED_COLOR_GREEN:
+         led.setColor(LedColor.GREEN)
+      elif color == self.LED_COLOR_AMBER:
+         led.setColor(LedColor.AMBER)
+      else:
+         led.setColor(LedColor.OFF)
+
+   def _setIntfColorLegacy(self, port, idx, color):
       color = color + 10 if self.tricolor else color
       portList = self.portSysfsMapping[port.portNum]
       if not portList:
