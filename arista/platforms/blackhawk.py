@@ -34,7 +34,8 @@ class BlackhawkO(FixedSystem):
    def __init__(self):
       super(BlackhawkO, self).__init__()
 
-      cpu = self.newComponent(RookCpu, fanCpldCls=TehamaFanCpld, mgmtBus=14)
+      cpu = self.newComponent(RookCpu, hasCpuLeds=False, fanCpldCls=TehamaFanCpld,
+                              mgmtBus=14)
       cpu.cpld.newComponent(Ucd90320, addr=cpu.switchDpmAddr(0x11), causes={
          'overtemp': UcdGpi(1),
          'powerloss': UcdGpi(3),
@@ -128,7 +129,7 @@ class BlackhawkO(FixedSystem):
             presentGpio=scd.inventory.getGpio("%s_present" % name),
             inputOkGpio=scd.inventory.getGpio("%s_ac_status" % name),
             outputOkGpio=scd.inventory.getGpio("%s_status" % name),
-            led=cpu.leds.inventory.getLed('%s_status' % name),
+            led=scd.inventory.getLed(name),
             psus=[
                DPS1600CB,
                DPS1600AB,
