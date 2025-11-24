@@ -18,6 +18,7 @@ from ..components.max31732 import Max31732
 from ..components.phy.screamingeagle import ScreamingEagle
 
 from ..descs.gpio import GpioDesc
+from ..descs.psu import PsuStatusPolicy
 from ..descs.reset import ResetDesc
 from ..descs.xcvr import QsfpDD, Qsfp112
 from ..descs.sensor import Position, SensorDesc
@@ -134,6 +135,7 @@ class CitrineBase(FixedSystem):
             slotId=psuId,
             addrFunc=addrFunc,
             presentGpio=scd.inventory.getGpio("%s_present" % name),
+            psuStatusPolicy=PsuStatusPolicy.PMBUS_STATUS,
             psus=[],
          )
 
