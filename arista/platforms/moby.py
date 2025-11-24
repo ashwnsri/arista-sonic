@@ -19,6 +19,7 @@ from ..components.xcvr import CmisEeprom
 
 # from ..descs.led import LedColor, LedDesc
 from ..descs.gpio import GpioDesc
+from ..descs.psu import PsuStatusPolicy
 from ..descs.reset import ResetDesc
 from ..descs.sensor import Position, SensorDesc
 from ..descs.xcvr import Osfp800, Qsfp28, Xcvr as XcvrDesc
@@ -171,7 +172,8 @@ class Moby(FixedSystem):
             addrFunc=addrFunc,
             presentGpio=True,
             psus=psuClasses,
-            forcePsuLoad=True
+            forcePsuLoad=True,
+            psuStatusPolicy=PsuStatusPolicy.PMBUS_STATUS,
          )
 
       port = self.cpu.getPciPort(self.cpu.PCI_PORT_SCD1)
