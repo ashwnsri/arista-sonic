@@ -1,7 +1,12 @@
 from collections import OrderedDict
+from typing import List
 
 from ..config import Config
 from ..inventory import Inventory
+from ..log import getLogger
+from ..quirk import Quirk
+
+logging = getLogger(__name__)
 
 DEFAULT_WAIT_TIMEOUT = 15
 
@@ -22,10 +27,11 @@ class Priority(object):
 
 class Component(object):
 
-   QUIRKS = None
+   QUIRKS: List[Quirk] = []
 
    def __init__(self, addr=None, priority=Priority.DEFAULT, drivers=None,
-                inventoryCls=None, inventory=None, parent=None, quirks=None,
+                inventoryCls=None, inventory=None, parent=None,
+                quirks=None,
                 **kwargs):
       super(Component, self).__init__()
       self.components = []
@@ -34,7 +40,7 @@ class Component(object):
       self.drivers = OrderedDict()
       self.inventory = inventory
       self.parent = parent
-      self.quirks = quirks or self.QUIRKS or []
+      self.quirks: List[Quirk] = quirks or self.QUIRKS.copy()
       self.label = None
       if not inventory and inventoryCls:
          self.inventory = inventoryCls()
@@ -99,10 +105,12 @@ class Component(object):
       return self.inventory
 
    def setup(self):
+      self.applyQuirks(Quirk.When.BEFORE)
       for driver in self.drivers.values():
          driver.setup()
       for driver in self.drivers.values():
          driver.finish()
+      self.applyQuirks(Quirk.When.AFTER)
 
    def finish(self, filters=Priority.defaultFilter):
       # underlying component are initialized recursively but require the parent to
@@ -135,12 +143,22 @@ class Component(object):
          driver.resetOut()
       for component in self.components:
          component.resetOut()
+      self.applyQuirks(Quirk.When.RESET)
 
    def waitForIt(self, timeout=DEFAULT_WAIT_TIMEOUT):
       for component in self.components:
          component.waitForIt(timeout)
 
-   def __diag__(self, ctx):
+   def applyQuirks(self, when: Quirk.When):
+      for quirk in self.quirks:
+         if quirk.when == when:
+            logging.info('%s: quirk: %s', self, quirk)
+            try:
+               quirk.run(self)
+            except Exception: # pylint: disable=broad-except
+               logging.exception('%s: quirk: %s failed', self, quirk)
+
+   def __diag__(self, ctx): # pylint: disable=unused-argument
       return {}
 
    def __try_diag__(self, ctx):

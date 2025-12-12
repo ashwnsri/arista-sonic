@@ -1,6 +1,7 @@
 
 from ....core.quirk import Quirk
 from ....core.register import RegisterMap, Register, RegBitRange
+from ....core.utils import inSimulation
 
 from ....libs.wait import waitFor
 
@@ -22,7 +23,8 @@ class Trident3X2(Trident3):
 
    class AvsQuirk(Quirk):
 
-      DELAYED = True
+      description = 'configure Asic VRM based on AVS'
+      when = Quirk.When.DELAYED
 
       ASIC_TO_MILLIVOLT = {
          0x1: 800,
@@ -37,7 +39,7 @@ class Trident3X2(Trident3):
       @property
       def vrm(self):
          if isinstance(self.vrm_, VrmDetector):
-             return self.vrm_.vrm
+            return self.vrm_.vrm
          return self.vrm
 
       def waitAsicRegisterReady(self, asic):
@@ -47,6 +49,8 @@ class Trident3X2(Trident3):
          )
 
       def run(self, component):
+         if inSimulation():
+            return
          self.waitAsicRegisterReady(component)
          value = component.driver.regs.avsValue()
          vout = self.ASIC_TO_MILLIVOLT.get(value)

@@ -63,7 +63,3 @@ class CrowCpu(Cpu):
                cpld.addFan(fanDesc),
             ]
          )
-
-   def setup(self):
-      self.applyQuirks()
-      super(CrowCpu, self).setup()

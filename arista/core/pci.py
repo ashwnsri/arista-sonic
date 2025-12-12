@@ -189,10 +189,6 @@ class PciPort(PciComponent):
          return False
       return os.path.exists(self.addr.getSysfsPath())
 
-   def setup(self, **kwargs):
-      super().setup(**kwargs)
-      self.applyQuirks()
-
    def pciAddr(self, device=0, func=0):
       addr = self.addrs.get((device, func))
       if addr is None:

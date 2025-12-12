@@ -1,4 +1,5 @@
 
+import enum
 import os
 import subprocess
 
@@ -7,29 +8,35 @@ from .utils import inSimulation
 
 logging = getLogger(__name__)
 
-class Quirk(object):
+class Quirk:
 
-   DESCRIPTION = ''
-   DELAYED = False
+   class When(enum.Enum):
+      # apply the quirk before loading the driver
+      BEFORE = 1
+      # apply the quirk after the driver is loaded
+      AFTER = 2
+      # apply the quirk after the taking the device out of reset
+      RESET = 3
+      # apply the quirk once the platform in the daemon
+      DELAYED = 4
+
+   description: str = ''
+   when: When = When.BEFORE
 
    def __str__(self):
-      return self.DESCRIPTION or super().__str__()
+      return self.description or f'{self.__class__.__name__}'
 
    def run(self, component):
       raise NotImplementedError
 
 class QuirkDesc(Quirk): # pylint: disable=abstract-method
-   def __init__(self, description):
+   def __init__(self, description=Quirk.description, when=Quirk.when):
       self.description = description
-
-   def __str__(self):
-      if self.description:
-         return self.description
-      return super().__str__()
+      self.when = when
 
 class QuirkCmd(QuirkDesc):
-   def __init__(self, cmd, description):
-      super().__init__(description)
+   def __init__(self, cmd, **kwargs):
+      super().__init__(**kwargs)
       self.cmd = cmd
 
    def run(self, component):
@@ -37,15 +44,18 @@ class QuirkCmd(QuirkDesc):
          subprocess.check_output(self.cmd)
 
 class PciConfigQuirk(QuirkCmd): # TODO: reparent when using PciTopology
-   def __init__(self, addr, expr, description):
-      super().__init__(['setpci', '-s', str(addr), expr], description)
+   when = Quirk.When.RESET
+   def __init__(self, addr, expr, description, **kwargs):
+      super().__init__(['setpci', '-s', str(addr), expr],
+                       description=description, **kwargs)
       self.addr = addr
       self.expr = expr
 
 class SysfsQuirk(QuirkDesc):
-   def __init__(self, entry, value, description=None):
+   when = Quirk.When.AFTER
+   def __init__(self, entry, value, description=None, **kwargs):
       description = description or f'{entry} <- {value}'
-      super().__init__(description)
+      super().__init__(description=description, **kwargs)
       self.entry = entry
       self.value = value
 
@@ -57,14 +67,15 @@ class SysfsQuirk(QuirkDesc):
       with open(path, "w", encoding='utf8') as f:
          f.write(f'{self.value}')
 
-class RegMapSetQuirk(Quirk):
-   DELAYED = True
-   REG_NAME = None
+class RegMapSetQuirk(QuirkDesc):
+   when = Quirk.When.DELAYED
+   REG_NAME: str = None
    REG_VALUE = None
-   def __init__(self):
-      assert self.DESCRIPTION
-      assert self.REG_NAME
-      assert self.REG_VALUE
+
+   def __init__(self, description=None, **kwargs):
+      description = description or self.description or \
+              f'{self.REG_NAME} <- {self.REG_VALUE}'
+      super().__init__(description=description, **kwargs)
 
    def run(self, component):
       if inSimulation():

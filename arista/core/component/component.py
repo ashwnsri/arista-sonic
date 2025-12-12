@@ -1,5 +1,6 @@
 
 from ..config import Config
+
 from . import Component as LegacyComponent
 from . import Priority
 
@@ -115,12 +116,3 @@ class Component(LegacyComponent):
             except Exception: # pylint: disable=broad-except
                logging.exception("%s: failed to refresh hardware thresholds for %s"
                                  % (self, ts))
-
-   def applyQuirks(self, delayed=False):
-      for quirk in self.quirks:
-         if quirk.DELAYED == delayed:
-            logging.info('%s: quirk: %s', self, quirk)
-            try:
-               quirk.run(self)
-            except Exception: # pylint: disable=broad-except
-               logging.exception('%s: quirk: %s failed', self, quirk)

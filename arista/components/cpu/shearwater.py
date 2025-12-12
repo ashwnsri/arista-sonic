@@ -6,7 +6,7 @@ from ..cpld import SysCpld, SysCpldCommonRegisters
 from ..scd import ScdReloadCauseRegisters
 
 class ShearwaterPowerCycleOnRailFaultQuirk(RegMapSetQuirk):
-   DESCRIPTION = 'enable power cycle on rail fault'
+   description = 'enable power cycle on rail fault'
    REG_NAME = 'powerCycleOnRailFault'
    REG_VALUE = True
 

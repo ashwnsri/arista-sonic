@@ -42,17 +42,14 @@ class KoiCpldRegisters(CrowCpldRegisters):
    )
 
 class DramScrubberQuirk(Quirk):
-   DELAYED = True
-   def __init__(self, rate=3121951, description='enable DRAM scrubber'):
+   when = Quirk.When.DELAYED
+   description = 'enable DRAM scrubber'
+   def __init__(self, rate=3121951):
       # Enable memory scrubber at a defined pace
       # linux/drivers/edac/amd64_edac.c for available rates
       # linux/drivers/edac/edac_mc_sysfs.c for sysfs logic
       # here 3.12MBps ~0.02% bandwidth for DDR3 1866MT/s taking ~45mins for 8GB
       self.rate = rate
-      self.description = description
-
-   def __str__(self):
-      return self.description
 
    def run(self, component):
       if inSimulation():
@@ -68,15 +65,12 @@ class DramScrubberQuirk(Quirk):
          f.write(str(self.rate))
 
 class CrowCpuFreqQuirk(Quirk):
-   def __init__(self, freq=2000000, description='change CPU max frequency'):
+   description = 'change CPU max frequency'
+   def __init__(self, freq=2000000):
       self.freq = freq
       self.cores = 4
-      self.description = description
 
-   def __str__(self):
-      return self.description
-
-   def run(self, component):
+   def run(self, component): # pylint: disable=unused-argument
       if inSimulation():
          return
       pathFmt = '/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq'

@@ -28,7 +28,7 @@ class GardenaCpldRegisters(SysCpldCommonRegistersV2):
    )
 
 class GardenaDpPwrFailQuirk(RegMapSetQuirk):
-   DESCRIPTION = 'enable DP_PWR_FAIL'
+   description = 'enable DP_PWR_FAIL'
    REG_NAME = 'powerCycleOnDpPowerFail'
    REG_VALUE = True
 

@@ -9,11 +9,12 @@ from .component import DEFAULT_WAIT_TIMEOUT
 from .component.pci import PciComponent
 from .driver.kernel.pci import PciKernelDriver
 from .log import getLogger
+from .quirk import Quirk
 from .utils import klog, inSimulation
 
 logging = getLogger(__name__)
 
-ASIC_YIELD_TIME = os.getenv( 'ASIC_YIELD_TIME', 2 )
+ASIC_YIELD_TIME = int( os.getenv( 'ASIC_YIELD_TIME', '2' ) )
 
 class SwitchChipDriver(PciKernelDriver):
    PASSIVE = True
@@ -96,7 +97,7 @@ class SwitchChip(PciComponent):
    def _resetOut(self, wait=True):
       if self.isOutOfReset():
          logging.debug('%s: already out of reset', self)
-         self.applyQuirks()
+         self.applyQuirks(Quirk.When.RESET)
          return
 
       logging.debug('%s: taking core out of reset', self)
@@ -109,7 +110,7 @@ class SwitchChip(PciComponent):
       for reset in self.pcieResets:
          reset.resetOut()
 
-      self.applyQuirks()
+      self.applyQuirks(Quirk.When.RESET)
 
       if wait:
          self.waitForIt()

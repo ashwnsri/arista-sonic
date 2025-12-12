@@ -5,9 +5,8 @@ from ..core.utils import inSimulation
 from ..drivers.pci import PciConfig
 
 class EcrcPciQuirk(Quirk):
-   def __str__(self):
-      return "Enable ECRC"
-
+   description = "Enable ECRC"
+   when = Quirk.When.AFTER
    def run(self, component):
       if inSimulation():
          return

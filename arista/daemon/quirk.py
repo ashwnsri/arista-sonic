@@ -1,6 +1,7 @@
 
 from ..core.daemon import registerDaemonFeature, OneShotFeature
 from ..core.log import getLogger
+from ..core.quirk import Quirk
 
 logging = getLogger(__name__)
 
@@ -11,6 +12,6 @@ class QuirkOneShotFeature(OneShotFeature):
 
    def run(self):
       for component in self.daemon.platform.iterComponents(filters=None):
-         if getattr(component, 'quirks', []):
+         if component.quirks:
             logging.info('%s: applying quirks on %s', self, component)
-            component.applyQuirks(delayed=True)
+            component.applyQuirks(Quirk.When.DELAYED)
