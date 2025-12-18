@@ -13,7 +13,11 @@ from ...core.pci import (
 )
 from ...tests.testing import patch
 
-from .helpers import classname, getAllSystems
+from .helpers import (
+   classname,
+   getAllSystems,
+   isAncestorToComponent,
+)
 
 @pytest.mark.parametrize('platform', getAllSystems(), ids=classname)
 def testSetup(platform):
@@ -44,3 +48,19 @@ def testPciAddrDuplication(platform):
          sysfsPath = c.addr.getSysfsPath()
          assert sysfsPath not in sysfsSet
          sysfsSet.add(sysfsPath)
+
+@pytest.mark.parametrize('platform', getAllSystems(), ids=classname)
+def testCorrectParenting(platform):
+   for c in platform.iterComponents(filters=None):
+      assert c in c.parent.components
+
+      parent = None
+      if hasattr(c, 'addr'):
+         # FIXME: use a common `parent` attribute for all these Addr types
+         parent = getattr(c.addr, 'scd_', None) or parent # ScdI2cAddr
+         parent = getattr(c.addr, 'pca_', None) or parent # PcaI2cAddr
+         parent = getattr(c.addr, 'port', None) or parent # PciAddr
+         parent = parent or c.parent
+
+      if parent is not None:
+         assert isAncestorToComponent(c, parent)

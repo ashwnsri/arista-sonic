@@ -6,7 +6,6 @@ from ...components.eeprom import At24C512
 from ...components.microsemi import MicrosemiPortDesc
 
 from ...core.platform import registerPlatform
-from ...core.types import PciAddr
 
 from ..cpu.sprucefish import SprucefishCpu
 

@@ -18,3 +18,17 @@ getAllSystems = getAllFixedSystems
 
 def classname(obj):
    return obj.__class__.__name__
+
+def isChildComponentOf(component, parent):
+   while parent:
+      if component in parent.components:
+         return True
+      parent = parent.parent
+   return False
+
+def isAncestorToComponent(component, ancestor):
+   while component:
+      if component == ancestor:
+         return True
+      component = component.parent
+   return False

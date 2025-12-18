@@ -86,8 +86,8 @@ class Cloverdale(FixedSystem):
       # transaction is done at the same moment of the poweroff, the handling of
       # the DPM is disabled. If you want rail information use it at your own risk
       # The current implementation will just read the firmware information once.
-      self.newComponent(Ucd90120A, scd.i2cAddr(1, 0x4e, t=3))
-      self.newComponent(Ucd90160, scd.i2cAddr(5, 0x4e, t=3), causes={
+      scd.newComponent(Ucd90120A, scd.i2cAddr(1, 0x4e, t=3))
+      scd.newComponent(Ucd90160, scd.i2cAddr(5, 0x4e, t=3), causes={
          'reboot': UcdGpi(2),
          'watchdog': UcdGpi(3),
          'powerloss': UcdMon(13),
