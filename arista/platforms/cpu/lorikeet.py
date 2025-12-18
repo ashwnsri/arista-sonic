@@ -68,7 +68,7 @@ class LorikeetCpu(Cpu):
          fanCount=self.parent.CHASSIS.FAN_COUNT,
       )
 
-      self.syscpld = self.newComponent(LorikeetSysCpld, addr=cpld.i2cAddr(4, 0x23),
+      self.syscpld = cpld.newComponent(LorikeetSysCpld, addr=cpld.i2cAddr(4, 0x23),
                                        registerCls=cpldRegisterCls)
 
       # TODO: Add ISL69247 temp sensors

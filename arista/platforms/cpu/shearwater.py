@@ -45,7 +45,7 @@ class ShearwaterCpu(Cpu):
       self.fanboard = self.parent.CHASSIS.addFanboard(cpld, cpld.getSmbus(7))
 
       # TODO: cleanup syscpld declaration accross platforms
-      self.syscpld = self.newComponent(ShearwaterSysCpld, addr=cpld.i2cAddr(4, 0x23))
+      self.syscpld = cpld.newComponent(ShearwaterSysCpld, addr=cpld.i2cAddr(4, 0x23))
       self.syscpld.addPowerCycle()
 
       cpld.addReloadCauseProvider(causes=[

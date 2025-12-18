@@ -95,7 +95,7 @@ class SkylarkCpu(Cpu):
 
       self.addFanGroup(self.parent.CHASSIS.FAN_SLOTS, self.parent.CHASSIS.FAN_COUNT)
 
-      self.syscpld = self.newComponent(SkylarkSysCpld,
+      self.syscpld = cpld.newComponent(SkylarkSysCpld,
                                        addr=cpld.i2cAddr(4, 0x23),
                                        registerCls=registerCls)
       self.syscpld.addPowerCycle()

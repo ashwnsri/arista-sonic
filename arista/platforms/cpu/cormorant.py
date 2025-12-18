@@ -70,7 +70,7 @@ class CormorantCpu(Cpu):
          fanCount=self.parent.CHASSIS.FAN_COUNT,
       )
 
-      self.syscpld = self.newComponent(CormorantSysCpld, addr=cpld.i2cAddr(4, 0x23),
+      self.syscpld = cpld.newComponent(CormorantSysCpld, addr=cpld.i2cAddr(4, 0x23),
                                        registerCls=cpldRegisterCls)
 
    def addCpuDpm(self, addr=None, causes=None):

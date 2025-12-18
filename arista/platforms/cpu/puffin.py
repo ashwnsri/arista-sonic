@@ -70,7 +70,7 @@ class PuffinPrimeCpu(Cpu):
 
       self.addFanGroup(self.parent.CHASSIS.FAN_SLOTS, self.parent.CHASSIS.FAN_COUNT)
 
-      self.syscpld = self.newComponent(PuffinPrimeSysCpld,
+      self.syscpld = cpld.newComponent(PuffinPrimeSysCpld,
                                        addr=cpld.i2cAddr(4, 0x23),
                                        registerCls=registerCls)
       self.syscpld.addPowerCycle()

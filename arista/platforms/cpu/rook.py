@@ -94,7 +94,7 @@ class RookCpu(Cpu):
 
       cpld.createPowerCycle()
 
-      self.syscpld = self.newComponent(RookSysCpld, addr=cpld.i2cAddr(8, 0x23),
+      self.syscpld = cpld.newComponent(RookSysCpld, addr=cpld.i2cAddr(8, 0x23),
                                        registerCls=cpldRegisterCls,
                                        quirks=sysCpldQuirks or [])
 
