@@ -23,6 +23,21 @@ class Pwr568(AristaPsu):
       PsuIdent('PWR-00568', 'PWR-2011-AC-RED', Airflow.EXHAUST),
    ]
 
+class Pwr581(AristaPsu):
+   CAPACITY = 500
+   DESCRIPTION = psuDescHelper(
+      sensors=[
+         ('inlet', Position.INLET, 55, 65, 70),
+         ('primary hotspot', Position.OTHER, 80, 88, 93),
+         ('secondary hotspot', Position.OTHER, 80, 108, 113),
+      ],
+      maxRpm=20500,
+   )
+   IDENTIFIERS = [
+      PsuIdent('PWR-00581', 'PWR-512-AC-RED', Airflow.EXHAUST),
+      PsuIdent('PWR-00582', 'PWR-512-AC-BLUE', Airflow.INTAKE),
+   ]
+
 class Pwr585(AristaPsu):
    # Also for Pwr586
    CAPACITY = 1500
