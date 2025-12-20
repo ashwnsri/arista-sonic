@@ -7,6 +7,7 @@
 #include <linux/i2c.h>
 #include <linux/hwmon.h>
 #include <linux/regmap.h>
+#include <linux/version.h>
 
 /* common definitions*/
 #define MAX3173X_STOP                      BIT(7)
@@ -632,7 +633,11 @@ static struct i2c_driver max31732_driver = {
         .of_match_table = of_match_ptr(max31732_of_match),
         .pm    = &max31732_pm_ops,
     },
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
     .probe_new    = max31732_probe,
+#else
+    .probe        = max31732_probe,
+#endif
     .id_table    = max31732_ids,
 };
 

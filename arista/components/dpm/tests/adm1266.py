@@ -377,6 +377,7 @@ class TestAdmCauseUnique: # pylint: disable=too-many-public-methods
       if missingActivePin:
          removedPin = activePins.pop()
       if extraActivePin:
+         # pylint: disable-next=possibly-used-before-assignment
          excludedPins = activePins | {removedPin} if missingActivePin else activePins
          extraPin = next(
             (i for i in range(1, maxPinNum + 1) if i not in excludedPins), None)
