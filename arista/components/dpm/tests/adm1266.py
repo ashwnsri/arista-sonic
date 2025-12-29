@@ -372,6 +372,7 @@ class TestAdmCauseUnique: # pylint: disable=too-many-public-methods
       )
 
       activePins = set(causePins)
+      removedPin = None
 
       # These are the two "no match" scenarios
       if missingActivePin:
